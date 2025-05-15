@@ -1,5 +1,6 @@
-from django.urls import path
 from ferremasApp import views
+from django.contrib import admin
+from django.urls import path, include
 
 urlpatterns = [
     path('', views.home, name="Home"),
@@ -8,4 +9,7 @@ urlpatterns = [
     path('reseñas/', views.reseñas, name="Reseñas"),
     path('contacto/', views.contacto, name="Contacto"),
     path('api/conversion/', views.api_conversion, name='api_conversion'),
+
+    # Incluir las URLs de la app api para productos y categorias
+    path('api/', include('api.urls')),  
 ]

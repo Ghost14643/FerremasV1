@@ -3,6 +3,12 @@ import requests
 from datetime import date
 from django.http import JsonResponse
 import json  # Usaremos json para la API de la CMF
+from rest_framework.permissions import AllowAny
+from rest_framework import viewsets
+
+
+
+
 
 # Tu API Key de la CMF
 API_KEY_CMF = "793d989c2c3b0987eb56404ed529a24910086f80"
@@ -51,3 +57,4 @@ def api_conversion(request):
         return JsonResponse({"valor": valor})
     else:
         return JsonResponse({"error": "No se pudo obtener el valor del dólar desde la CMF"})
+    
