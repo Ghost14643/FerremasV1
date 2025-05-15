@@ -1,0 +1,23 @@
+{% extends 'ferremasApp/base.html' %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="card mx-auto shadow text-center" style="max-width: 600px;">
+        <div class="card-body">
+            <h1 class="card-title text-success mb-4">¡Pago realizado con éxito!</h1>
+            <p class="lead mb-4">Gracias por tu compra. Aquí están los detalles de la transacción:</p>
+
+            <ul class="list-group text-start mb-4">
+                <li class="list-group-item"><strong>Orden de compra:</strong> {{ response.buy_order }}</li>
+                <li class="list-group-item"><strong>Monto:</strong> ${{ response.amount }}</li>
+                <li class="list-group-item"><strong>Código de autorización:</strong> {{ response.authorization_code }}</li>
+                <li class="list-group-item"><strong>Código de comercio:</strong> {{ response.commerce_code }}</li>
+                <li class="list-group-item"><strong>Fecha de pago:</strong> {{ response.transaction_date }}</li>
+                <li class="list-group-item"><strong>Estado:</strong> {{ response.status }}</li>
+            </ul>
+
+            <a href="{% url 'Home' %}" class="btn btn-primary">Volver al Inicio</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

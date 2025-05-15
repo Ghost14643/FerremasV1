@@ -26,6 +26,7 @@ urlpatterns = [
     path('', include('ferremasApp.urls')),
     path('api/', include('api.urls')),
     
+    
     #path('ferremasApp/', include('ferremasApp.urls')),
     #path('ferremasApp/', include('ferremasApp.urls')),
 ]
