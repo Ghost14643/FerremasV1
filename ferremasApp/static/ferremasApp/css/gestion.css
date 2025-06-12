@@ -19,7 +19,7 @@ h1, h2, h3, h4, h5, h6 {
 
 /* Títulos de sitio */
 .site-heading {
-    margin: 5rem 0;
+    margin: 5rem 0; /* Combina margin-top y margin-bottom */
     text-transform: uppercase;
     line-height: 1;
 }
@@ -109,11 +109,11 @@ h1, h2, h3, h4, h5, h6 {
 
 /* Botones */
 .btn, .btn-xl {
-    font-weight: 600;
+    font-weight: 600; /* Se mantiene este peso de fuente más general */
     padding: 0.75rem 1.5rem;
     border-radius: 0.375rem;
     transition: all 0.2s ease;
-    border: none;
+    border: none; /* Se asegura de que los botones no tengan borde por defecto */
 }
 
 .btn-xl {
@@ -145,8 +145,8 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .intro .intro-text {
-    position: absolute;
-    top: 0;
+    position: absolute; /* Mantiene la posición absoluta */
+    top: 0; /* Asegura el top: 0 */
     left: 0;
     width: 60%;
     margin-top: 3rem;
