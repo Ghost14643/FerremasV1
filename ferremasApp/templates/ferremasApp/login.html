@@ -1,0 +1,39 @@
+{% extends "ferremasApp/base.html" %}
+{% load static %}
+
+{% block title %}Iniciar Sesión - Ferremas{% endblock %}
+
+{% block extra_head %}
+{# No se necesita un estilo específico aquí si gestion.css ya tiene .form-container #}
+{# Si los estilos para .form-container están en gestion.css, este bloque puede estar vacío o eliminarse #}
+{% endblock %}
+
+{% block content %}
+<section class="page-section cta">
+    <div class="container">
+        <div class="form-container"> {# Asumiendo que .form-container está en gestion.css #}
+            <h2>Iniciar Sesión</h2>
+            <form method="POST" action="{% url 'login' %}"> {# CAMBIO AQUÍ: 'login_view' a 'login' #}
+                {% csrf_token %}
+                <div class="mb-3">
+                    <label for="username" class="form-label">Nombre de usuario</label>
+                    <input type="text" class="form-control" id="username" name="username" required>
+                </div>
+                <div class="mb-3">
+                    <label for="password" class="form-label">Contraseña</label>
+                    <input type="password" class="form-control" id="password" name="password" required>
+                </div>
+                {% if messages %}
+                    <ul class="messages list-unstyled text-danger">
+                        {% for message in messages %}
+                            <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+                        {% endfor %}
+                    </ul>
+                {% endif %}
+                <button type="submit" class="btn btn-primary">Entrar</button>
+                <p class="text-center mt-3">¿No tienes cuenta? <a href="{% url 'registro' %}">Regístrate aquí</a></p> {# CAMBIO AQUÍ: 'registro_view' a 'registro' #}
+            </form>
+        </div>
+    </div>
+</section>
+{% endblock %}

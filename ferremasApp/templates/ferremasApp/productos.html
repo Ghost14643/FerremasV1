@@ -1,0 +1,77 @@
+{% extends "ferremasApp/base.html" %}
+
+{% block content %}
+<div class="container">
+    <h1>Catálogo de Productos</h1>
+
+    <div style="margin-bottom: 1rem;">
+        <input type="text" id="search-input" placeholder="Buscar productos..." />
+        <button onclick="buscarProductos()">Buscar</button>
+    </div>
+
+    <div>
+        <label for="categoria-select">Filtrar por categoría:</label>
+        <select id="categoria-select" onchange="buscarProductos()">
+            <option value="">Todas</option>
+        </select>
+    </div>
+
+    <div id="productos-container" style="margin-top: 2rem;"></div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    cargarCategorias();
+    buscarProductos();
+});
+
+function cargarCategorias() {
+    fetch('/api/categorias/')
+        .then(res => res.json())
+        .then(categorias => {
+            const select = document.getElementById('categoria-select');
+            categorias.forEach(cat => {
+                const option = document.createElement('option');
+                option.value = cat.nombre;
+                option.textContent = cat.nombre;
+                select.appendChild(option);
+            });
+        });
+}
+
+function buscarProductos() {
+    const searchInput = document.getElementById('search-input').value;
+    const categoriaSelect = document.getElementById('categoria-select').value;
+    let url = '/api/productos/';
+
+    if (searchInput || categoriaSelect) {
+        const searchParam = categoriaSelect || searchInput;
+        url += '?search=' + encodeURIComponent(searchParam);
+    }
+
+    fetch(url)
+        .then(res => res.json())
+        .then(productos => {
+            const container = document.getElementById('productos-container');
+            container.innerHTML = '';
+            if (productos.length === 0) {
+                container.innerHTML = '<p>No se encontraron productos.</p>';
+                return;
+            }
+
+            productos.forEach(p => {
+                const div = document.createElement('div');
+                div.innerHTML = `
+                    <h3>${p.nombre}</h3>
+                    <p><strong>Marca:</strong> ${p.marca}</p>
+                    <p><strong>Código:</strong> ${p.codigo}</p>
+                    <p><strong>Precio:</strong> $${parseFloat(p.precio).toLocaleString('es-CL')}</p>
+                    <p><strong>Stock:</strong> ${p.stock}</p>
+                    <hr>
+                `;
+                container.appendChild(div);
+            });
+        });
+}
+</script>
+{% endblock %}

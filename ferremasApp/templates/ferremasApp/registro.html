@@ -1,0 +1,37 @@
+{% extends "ferremasApp/base.html" %}
+{% load static %}
+
+{% block title %}Registro - Ferremas{% endblock %}
+
+{% block extra_head %}
+{# Si los estilos para .form-container están en gestion.css, este bloque puede estar vacío o eliminarse #}
+{% endblock %}
+
+{% block content %}
+<section class="page-section cta">
+    <div class="container">
+        <div class="form-container"> {# Asumiendo que .form-container está en gestion.css #}
+            <h2>Crear Cuenta</h2>
+
+            {# Mostrar mensajes de Django (éxito, error, etc.) #}
+            {% if messages %}
+                <ul class="messages list-unstyled">
+                    {% for message in messages %}
+                        <li class="alert {% if message.tags %}alert-{{ message.tags }}{% endif %}">{{ message }}</li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+
+            <form method="POST" action="{% url 'registro' %}"> {# <-- ¡CAMBIO AQUÍ! #}
+                {% csrf_token %}
+
+                {# ESTA ES LA ÚNICA LÍNEA NECESARIA PARA RENDERIZAR TODOS LOS CAMPOS DEL FORMULARIO #}
+                {{ form.as_p }} 
+
+                <button type="submit" class="btn btn-primary">Registrarse</button>
+                <p class="text-center mt-3">¿Ya tienes cuenta? <a href="{% url 'login' %}">Inicia sesión</a></p> {# <-- ¡CAMBIO AQUÍ! #}
+            </form>
+        </div>
+    </div>
+</section>
+{% endblock %}

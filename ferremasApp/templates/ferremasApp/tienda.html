@@ -1,221 +1,221 @@
 {% extends "ferremasApp/base.html" %}
+{% load static %}
+
+{% block title %}Tienda - Ferremas{% endblock %}
+
+{% block extra_head %}
+{# Aquí van los enlaces a librerías y estilos específicos de la tienda #}
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
+<style>
+    /*
+     * Importante: El `body` y `mainNav` se definen en `base.html` o `gestion.css`.
+     * Evita redefinirlos aquí a menos que sea una sobreescritura MUY específica.
+     */
+
+    /* Ajuste para el container principal de tienda y carrito
+     * El estilo del `.container` ahora debe manejar solo el fondo/sombra si es necesario,
+     * pero el espaciado superior/inferior debería venir del `.page-section`.
+     */
+    .page-section .container {
+        /* max-width ya viene de la base. No es necesario redefinir */
+        /* margin ya viene del .page-section. No es necesario redefinir */
+        padding: 2rem; /* Mantén el padding interno */
+        background-color: #ffffff; /* Fondo blanco */
+        border-radius: 8px; /* Bordes ligeramente redondeados */
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05); /* Sombra sutil */
+    }
+
+    h1 {
+        font-weight: 700;
+        margin-bottom: 2.5rem;
+        text-align: center;
+        color: #000;
+    }
+
+    /* --- Estilos Específicos del Carrito de Compras (Icono y Mensaje) --- */
+    /* Asegúrate de que el icono fijo tenga espacio en la parte superior para no chocar con la barra de navegación */
+    .carrito-icono {
+        position: fixed;
+        top: 80px; /* Ajustado para estar debajo de la navbar principal */
+        right: 20px;
+        font-size: 1.8rem;
+        color: #007bff;
+        cursor: pointer;
+        z-index: 1050;
+        transition: color 0.3s ease;
+    }
+    .carrito-icono:hover { color: #0056b3; }
+    .badge-carrito {
+        position: absolute;
+        top: -6px;
+        right: -10px;
+        background-color: #007bff;
+        color: #fff;
+        font-size: 0.75rem;
+        font-weight: 700;
+        padding: 3px 7px;
+        border-radius: 9999px;
+        pointer-events: none;
+    }
+    #mensaje-carrito {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        background-color: #007bff;
+        color: #ffffff;
+        padding: 0.8rem 1.2rem;
+        border-radius: 10px;
+        font-weight: 600;
+        box-shadow: 0 4px 14px rgba(0, 123, 255, 0.6);
+        opacity: 0;
+        transition: opacity 0.4s ease;
+        z-index: 1060;
+        pointer-events: none;
+    }
+    #mensaje-carrito.show { opacity: 1; pointer-events: auto; }
+
+    /* --- Estilos Específicos de las Tarjetas de Producto (Tienda) --- */
+    .card {
+        background: #ffffff;
+        border: 1px solid #007bff;
+        border-radius: 16px;
+        color: #000000;
+        box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1);
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        overflow: hidden;
+    }
+    .card:hover {
+        transform: translateY(-6px);
+        box-shadow: 0 12px 24px rgba(0, 0, 0, 0.2);
+    }
+    .card img {
+        width: 100%;
+        max-height: 180px;
+        object-fit: contain;
+        background-color: #f1f1f1;
+        padding: 10px;
+        border-bottom: 1px solid #007bff;
+    }
+    .card-body { padding: 1.2rem; }
+    .card-title { font-size: 1.1rem; font-weight: 700; color: #000000; }
+    .card-text {
+        font-size: 0.9rem;
+        color: #333333;
+        margin-bottom: 1rem;
+        min-height: 48px;
+    }
+    .precio-stock {
+        display: flex;
+        justify-content: space-between;
+        font-weight: 600;
+        font-size: 0.95rem;
+        color: #007bff;
+        margin-bottom: 1rem;
+    }
+    .btn-agregar {
+        background-color: #007bff;
+        color: #ffffff;
+        font-weight: 700;
+        border: none;
+        border-radius: 10px;
+        padding: 0.5rem 1rem;
+        transition: background-color 0.3s ease;
+    }
+    .btn-agregar:hover { background-color: #0056b3; }
+</style>
+{% endblock %}
 
 {% block content %}
-<style>
-  body {
-    background-color: #000;
-    color: #eee;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  }
-  .container {
-    max-width: 960px;
-    margin: 3rem auto;
-    padding: 1rem 1.5rem;
-  }
-  h1 {
-    font-weight: 600;
-    margin-bottom: 2rem;
-    text-align: center;
-    letter-spacing: 1.2px;
-  }
-  /* Carrito ícono y contador minimalista */
-  .carrito-icono {
-    position: fixed;
-    top: 20px;
-    right: 20px;
-    font-size: 1.8rem;
-    color: #eee;
-    cursor: pointer;
-    z-index: 1050;
-    transition: color 0.3s ease;
-  }
-  .carrito-icono:hover {
-    color: #1a73e8;
-  }
-  .badge-carrito {
-    position: absolute;
-    top: -6px;
-    right: -10px;
-    background-color: #e03e3e;
-    color: white;
-    font-size: 0.75rem;
-    font-weight: 700;
-    padding: 2px 6px;
-    border-radius: 9999px;
-    pointer-events: none;
-  }
-  /* Cards de productos */
-  .card {
-    background: #111;
-    border: none;
-    border-radius: 12px;
-    color: #eee;
-    box-shadow: 0 4px 10px rgb(255 255 255 / 0.05);
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    height: 100%;
-    transition: transform 0.3s ease;
-  }
-  .card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 10px 20px rgb(26 115 232 / 0.3);
-  }
-  .card img {
-    max-height: 150px;
-    object-fit: contain;
-    border-radius: 12px 12px 0 0;
-  }
-  .card-body {
-    padding: 1rem 1.25rem;
-  }
-  .card-title {
-    font-weight: 700;
-    margin-bottom: 0.5rem;
-    font-size: 1.1rem;
-  }
-  .card-text {
-    font-size: 0.85rem;
-    color: #bbb;
-    margin-bottom: 1rem;
-    min-height: 40px;
-  }
-  .precio-stock {
-    display: flex;
-    justify-content: space-between;
-    font-weight: 600;
-    font-size: 0.95rem;
-    margin-bottom: 1rem;
-  }
-  .btn-agregar {
-    background-color: #1a73e8;
-    border: none;
-    border-radius: 8px;
-    color: white;
-    font-weight: 600;
-    padding: 0.45rem 1rem;
-    cursor: pointer;
-    width: 100%;
-    transition: background-color 0.3s ease;
-  }
-  .btn-agregar:hover {
-    background-color: #155ab6;
-  }
-  /* Mensaje fijo de confirmación */
-  #mensaje-carrito {
-    position: fixed;
-    bottom: 20px;
-    right: 20px;
-    z-index: 1060;
-    background-color: #28a745;
-    color: white;
-    padding: 0.8rem 1.2rem;
-    border-radius: 8px;
-    font-weight: 600;
-    box-shadow: 0 4px 12px rgb(0 0 0 / 0.4);
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity 0.3s ease;
-  }
-  #mensaje-carrito.show {
-    opacity: 1;
-    pointer-events: auto;
-  }
-</style>
+{# Envuelve el contenido principal en una sección con las clases de la plantilla base #}
+<section class="page-section cta">
+    <div class="container"> {# Este container ya tiene el max-width por defecto de Bootstrap, y los estilos de arriba #}
+        <h1>🛒 Catálogo de Productos</h1>
 
-<div class="container">
-    <h1>Catálogo de Productos</h1>
+        <a href="{% url 'carrito' %}" class="carrito-icono" aria-label="Ver carrito">
+            <i class="bi bi-cart-fill"></i>
+            <span id="contador-carrito" class="badge-carrito">0</span>
+        </a>
 
-    <!-- Ícono carrito fijo -->
-    <a href="{% url 'carrito' %}" class="carrito-icono" aria-label="Ver carrito">
-        <i class="bi bi-cart"></i>
-        <span id="contador-carrito" class="badge-carrito">0</span>
-    </a>
+        <div id="productos-container" class="row g-4"></div>
 
-    <div id="productos-container" class="row g-4"></div>
+        <div id="mensaje-carrito" role="alert" aria-live="polite"></div>
+    </div>
+</section>
+{% endblock %}
 
-    <div id="mensaje-carrito" role="alert" aria-live="polite"></div>
-</div>
-
+{% block extra_js %}
+{# Tu JavaScript específico de la tienda #}
 <script>
-document.addEventListener("DOMContentLoaded", function () {
-    cargarProductos();
-    actualizarContador();
-});
+    document.addEventListener("DOMContentLoaded", function () {
+        cargarProductos();
+        actualizarContador();
+    });
 
-function cargarProductos() {
-    fetch("/api/productos")
-        .then(response => {
-            if (!response.ok) throw new Error("No se pudo obtener la lista de productos.");
-            return response.json();
-        })
-        .then(productos => {
-            const container = document.getElementById("productos-container");
-            container.innerHTML = "";
+    function cargarProductos() {
+        fetch("/api/productos")
+            .then(response => {
+                if (!response.ok) throw new Error("No se pudo obtener la lista de productos.");
+                return response.json();
+            })
+            .then(productos => {
+                const container = document.getElementById("productos-container");
+                container.innerHTML = "";
 
-            productos.forEach(producto => {
-                const col = document.createElement("div");
-                col.className = "col-12 col-sm-6 col-md-4";
+                productos.forEach(producto => {
+                    const col = document.createElement("div");
+                    col.className = "col-12 col-sm-6 col-md-4";
 
-                col.innerHTML = `
-                    <div class="card h-100 shadow-lg rounded-4 animate__animated animate__fadeIn">
-                        <img src="${producto.imagen}" alt="${producto.nombre}" loading="lazy">
-
-                        <div class="card-body d-flex flex-column">
-                            <h5 class="card-title">${producto.nombre}</h5>
-                            <p class="card-text">${producto.descripcion}</p>
-                            <div class="precio-stock">
-                                <span>$${parseInt(producto.precio).toLocaleString('es-CL')}</span>
-                                <span>Stock: ${producto.stock}</span>
+                    col.innerHTML = `
+                        <div class="card h-100 animate__animated animate__fadeIn">
+                            <img src="${producto.imagen}" alt="${producto.nombre}" loading="lazy">
+                            <div class="card-body d-flex flex-column">
+                                <h5 class="card-title">${producto.nombre}</h5>
+                                <p class="card-text">${producto.descripcion}</p>
+                                <div class="precio-stock">
+                                    <span>$${parseInt(producto.precio).toLocaleString('es-CL')}</span>
+                                    <span>Stock: ${producto.stock}</span>
+                                </div>
+                                <button class="btn-agregar mt-auto" onclick="agregarAlCarrito(${producto.id})">
+                                    <i class="bi bi-cart-plus"></i> Agregar
+                                </button>
                             </div>
-                            <button class="btn-agregar mt-auto" onclick="agregarAlCarrito(${producto.id})" aria-label="Agregar ${producto.nombre} al carrito">
-                                <i class="bi bi-cart-plus"></i> Agregar
-                            </button>
                         </div>
-                    </div>
-                `;
-                container.appendChild(col);
+                    `;
+                    container.appendChild(col);
+                });
+            })
+            .catch(error => {
+                const container = document.getElementById("productos-container");
+                container.innerHTML = `<p class="text-danger text-center">No se pudieron cargar los productos.</p>`;
+                console.error(error);
             });
-        })
-        .catch(error => {
-            const container = document.getElementById("productos-container");
-            container.innerHTML = `<p class="text-danger text-center">No se pudieron cargar los productos.</p>`;
-            console.error(error);
-        });
-}
-
-function agregarAlCarrito(productoId) {
-    let carrito = JSON.parse(localStorage.getItem('carrito')) || [];
-    const index = carrito.findIndex(p => p.id === productoId);
-    if (index !== -1) {
-        carrito[index].cantidad += 1;
-    } else {
-        carrito.push({ id: productoId, cantidad: 1 });
     }
-    localStorage.setItem('carrito', JSON.stringify(carrito));
-    actualizarContador();
-    mostrarMensaje("Producto agregado al carrito");
-}
 
-function actualizarContador() {
-    let carrito = JSON.parse(localStorage.getItem('carrito')) || [];
-    let totalCantidad = carrito.reduce((sum, item) => sum + item.cantidad, 0);
-    document.getElementById("contador-carrito").textContent = totalCantidad;
-}
+    function agregarAlCarrito(productoId) {
+        let carrito = JSON.parse(localStorage.getItem('carrito')) || [];
+        const index = carrito.findIndex(p => p.id === productoId);
+        if (index !== -1) {
+            carrito[index].cantidad += 1;
+        } else {
+            carrito.push({ id: productoId, cantidad: 1 });
+        }
+        localStorage.setItem('carrito', JSON.stringify(carrito));
+        actualizarContador();
+        mostrarMensaje("Producto agregado al carrito");
+    }
 
-function mostrarMensaje(texto) {
-    const mensaje = document.getElementById('mensaje-carrito');
-    mensaje.textContent = texto;
-    mensaje.classList.add('show');
-    setTimeout(() => {
-        mensaje.classList.remove('show');
-    }, 2000);
-}
+    function actualizarContador() {
+        let carrito = JSON.parse(localStorage.getItem('carrito')) || [];
+        let totalCantidad = carrito.reduce((sum, item) => sum + item.cantidad, 0);
+        document.getElementById("contador-carrito").textContent = totalCantidad;
+    }
+
+    function mostrarMensaje(texto) {
+        const mensaje = document.getElementById('mensaje-carrito');
+        mensaje.textContent = texto;
+        mensaje.classList.add('show');
+        setTimeout(() => mensaje.classList.remove('show'), 2000);
+    }
 </script>
-
-<!-- Bootstrap Icons -->
-<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
-<!-- Animaciones CSS -->
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
-
 {% endblock %}

@@ -1,292 +1,523 @@
+/* Tipografía y cuerpo general */
 body {
-  font-family: 'Lora';
-  background: linear-gradient(rgba(47, 23, 15, 0.65), rgba(47, 23, 15, 0.65)), url("../img/ferremas2.jpg");
-  background-attachment: fixed;
-  background-position: center;
-  background-size: cover;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    background-color: #ffffff;
+    color: #1a1a1a;
+    line-height: 1.6;
 }
 
-h1,
-h2,
-h3,
-h4,
-h5,
-h6 {
-  font-family: 'Raleway';
+/* Encabezados */
+h1, h2, h3, h4, h5, h6 {
+    font-family: 'Inter', sans-serif;
+    font-weight: 600;
 }
 
-p {
-  line-height: 1.75;
-}
-
+/* Texto atenuado */
 .text-faded {
-  color: rgba(255, 255, 255, 0.3);
+    color: rgba(26, 26, 26, 0.7);
 }
 
+/* Títulos de sitio */
 .site-heading {
-  margin-top: 5rem;
-  margin-bottom: 5rem;
-  text-transform: uppercase;
-  line-height: 1;
-  font-family: 'Raleway';
+    margin: 5rem 0;
+    text-transform: uppercase;
+    line-height: 1;
 }
 
 .site-heading .site-heading-upper {
-  display: block;
-  font-size: 2rem;
-  font-weight: 800;
+    display: block;
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: #2563eb; /* Azul Ferremas */
 }
 
 .site-heading .site-heading-lower {
-  font-size: 5rem;
-  font-weight: 100;
-  line-height: 4rem;
+    font-size: 4rem;
+    font-weight: 700;
+    line-height: 4rem;
+    color: #1a1a1a; /* Negro para el texto principal del título */
 }
 
+/* Secciones generales */
 .page-section {
-  margin-top: 5rem;
-  margin-bottom: 5rem;
+    margin: 5rem 0; /* Mantiene el espaciado entre secciones */
 }
 
 .section-heading {
-  text-transform: uppercase;
+    text-transform: uppercase;
+    color: #1a1a1a;
 }
 
 .section-heading .section-heading-upper {
-  display: block;
-  font-size: 1rem;
-  font-weight: 800;
-  padding-bottom:.5rem;
-
+    display: block;
+    font-size: 1rem;
+    font-weight: 800;
+    color: #2563eb;
+    padding-bottom: 0.5rem;
 }
 
 .section-heading .section-heading-lower {
-  display: block;
-  font-size: 3rem;
-  font-weight: 100;
+    display: block;
+    font-size: 3rem;
+    font-weight: 700;
 }
 
-
-.section-heading .section-heading-under {
-  display: block;
-  font-size: 1rem;
-  text-transform: none;
-  font-weight: 300;
-  margin-top:.5rem;
-}
-
+/* Fondo sutil */
 .bg-faded {
-  background-color: rgba(255, 255, 255, 0.85);
+    background-color: rgba(255, 255, 255, 0.95);
 }
 
+/* Navegación principal */
 #mainNav {
-  background-color: rgb(0, 0, 0);
-  font-family: 'Raleway';
+    background-color: #ffffff;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    font-family: 'Inter', sans-serif;
 }
 
 #mainNav .navbar-brand {
-  color: #ffffff;
+    color: #1a1a1a; /* Negro para el texto de la marca */
+    font-weight: 700; /* Asegura que la marca sea legible */
+}
+
+#mainNav .navbar-toggler {
+    border: none;
+    padding: 0.5rem;
+}
+
+#mainNav .navbar-toggler:focus {
+    outline: none;
+    box-shadow: none;
 }
 
 #mainNav .navbar-nav .nav-item .nav-link {
-  color: rgba(255, 255, 255, 0.7);
-  font-weight: 800;
+    color: #1a1a1a; /* Color de los enlaces de navegación */
+    font-weight: 600;
+    font-size: 0.9rem;
+    padding: 1rem;
+    transition: color 0.2s ease;
+}
+
+#mainNav .navbar-nav .nav-item .nav-link:hover {
+    color: #2563eb; /* Azul al pasar el mouse */
 }
 
 #mainNav .navbar-nav .nav-item.active .nav-link {
-  color: #ffffff;
-  text-decoration: underline;
+    color: #2563eb; /* Azul para el ítem activo */
+    border-bottom: 2px solid #2563eb; /* Borde inferior para el ítem activo */
 }
 
-@media (min-width: 992px) {
-  #mainNav .navbar-nav .nav-item .nav-link {
-    font-size: 0.9rem;
-  }
-  #mainNav .navbar-nav .nav-item .nav-link:hover {
-    color: rgba(255, 255, 255, 0.4);
-    text-decoration: underline;
-  }
-  #mainNav .navbar-nav .nav-item.active .nav-link:hover {
-    color: #ffffff;
-    text-decoration: underline;
-  }
+
+/* Botones */
+.btn, .btn-xl {
+    font-weight: 600;
+    padding: 0.75rem 1.5rem;
+    border-radius: 0.375rem;
+    transition: all 0.2s ease;
+    border: none;
 }
 
 .btn-xl {
-  font-weight: 700;
-  font-size: 0.8rem;
-  padding-top: 1.5rem;
-  padding-bottom: 1.5rem;
-  padding-left: 2rem;
-  padding-right: 2rem;
+    font-size: 0.8rem;
+    padding: 1.5rem 2rem;
+    background-color: #2563eb;
+    color: white;
 }
 
+.btn-xl:hover,
+.btn-primary:hover {
+    background-color: #1d4ed8;
+}
+
+.btn-primary {
+    background-color: #2563eb;
+    color: #ffffff; /* Asegurar color de texto blanco */
+}
+
+/* Intro */
 .intro {
-  position: relative;
+    position: relative;
 }
 
-@media (min-width: 992px) {
-  .intro .intro-img {
+.intro .intro-img {
     width: 75%;
-    float: left;
-  }
-  .intro .intro-text {
-    left: 600;
+    float: right;
+    border-radius: 0.5rem;
+}
+
+.intro .intro-text {
+    position: absolute;
+    top: 0;
+    left: 0;
     width: 60%;
     margin-top: 3rem;
-    background-color: rgb(255, 208, 0);
-    color: rgb(0, 0, 0);
-    position: absolute;
-  }
-  .intro .intro-text .intro-button {
-    width: 100%;
-    left: 0;
-    position: absolute;
-    bottom: -2rem;
-  }
+    background-color: #ffffff;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    border-radius: 0.5rem;
+    padding: 3rem;
 }
 
-@media (min-width: 1200px) {
-  .intro .intro-text {
-    width: 45%;
-  }
-}
-
+/* Call to Action - Usado también como fondo para tienda y carrito */
 .cta {
-  padding-top: 5rem;
-  padding-bottom: 5rem;
-  background-color: rgb(242, 245, 240);
+    padding: 5rem 0; /* Espaciado superior e inferior para las secciones */
+    background-color: #f8fafc; /* Fondo gris claro */
 }
 
 .cta .cta-inner {
-  position: relative;
-  padding: 3rem;
-  margin: 0.5rem;
-  background-color: rgb(217, 148, 0);
-  color: cornsilk;
+    position: relative;
+    padding: 3rem;
+    margin: 0.5rem;
+    background-color: #ffffff;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    border-radius: 0.5rem;
 }
 
-.cta .cta-inner:before {
-  border-radius: 0.5rem;
-  content: '';
-  position: absolute;
-  top: -0.5rem;
-  bottom: -0.5rem;
-  left: -0.5rem;
-  right: -0.5rem;
-  border: 0.25rem solid rgba(255, 255, 255, 0.85);
+/* Footer */
+.footer {
+    background-color: #1a1a1a; /* Fondo negro */
+    color: #ffffff;
+    padding: 4rem 0;
 }
 
-.cta .cta-innerv {
-  position: relative;
-  padding: 3rem;
-  margin: 0.5rem;
-  background-color: rgba(255, 255, 255, 0.85);
+.footer a.link {
+    color: rgba(255, 255, 255, 0.8);
+    transition: color 0.2s ease;
 }
 
-@media (min-width: 992px) {
-  .about-heading .about-heading-img {
-    position: relative;
-    z-index: 0;
-  }
-  .about-heading .about-heading-content {
-    margin-top: -5rem;
-    position: relative;
-    z-index: 1;
-  }
+.footer a.link:hover {
+    color: #2563eb; /* Azul al pasar el mouse */
+    text-decoration: none;
 }
 
-@media (min-width: 992px) {
-  .product-item .product-item-title {
-    position: relative;
-    z-index: 1;
-    margin-bottom: -3rem;
-  }
-  .product-item .product-item-img {
-    position: relative;
-    z-index: 0;
-    max-width: 60vw;
-  }
-  .product-item .product-item-description {
-    position: relative;
-    z-index: 1;
-    margin-top: -3rem;
-    max-width: 50vw;
-  }
+/* Social Icons (Font Awesome) */
+.social-icons .fa-stack-2x { color: #2563eb; } /* Color de los círculos de los iconos */
+.social-icons .fa-inverse { color: #ffffff; } /* Color de los iconos sociales */
+
+
+/* --- Estilos para Tienda y Carrito (añadidos/actualizados) --- */
+
+/* Contenedor principal de la página de tienda/carrito */
+/* Este estilo se aplica al .container dentro de un .page-section.cta */
+.page-section.cta .container {
+    padding: 2rem; /* Padding interno */
+    background-color: #ffffff; /* Fondo blanco */
+    border-radius: 8px; /* Bordes ligeramente redondeados */
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05); /* Sombra sutil */
+    /* max-width y margin: auto; ya vienen de la clase .container de Bootstrap */
+}
+
+/* Título de la página de catálogo */
+.page-section.cta .container h1 {
+    font-weight: 700;
+    margin-bottom: 2.5rem;
+    text-align: center;
+    color: #1a1a1a; /* Coherente con el texto principal */
+}
+
+/* Icono del carrito flotante */
+.carrito-icono {
+    position: fixed;
+    top: 80px; /* Ajustado para estar debajo de la navbar principal */
+    right: 20px;
+    font-size: 1.8rem;
+    color: #2563eb; /* Azul Ferremas */
+    cursor: pointer;
+    z-index: 1050;
+    transition: color 0.3s ease;
+}
+.carrito-icono:hover {
+    color: #1d4ed8; /* Azul oscuro al pasar el mouse */
+}
+.badge-carrito {
+    position: absolute;
+    top: -6px;
+    right: -10px;
+    background-color: #2563eb; /* Azul Ferremas */
+    color: #fff;
+    font-size: 0.75rem;
+    font-weight: 700;
+    padding: 3px 7px;
+    border-radius: 9999px;
+    pointer-events: none;
+}
+
+/* Mensaje flotante de "Producto agregado" */
+#mensaje-carrito {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background-color: #2563eb; /* Azul Ferremas */
+    color: #ffffff;
+    padding: 0.8rem 1.2rem;
+    border-radius: 10px;
+    font-weight: 600;
+    box-shadow: 0 4px 14px rgba(0, 123, 255, 0.6); /* Sombra con tono azul */
+    opacity: 0;
+    transition: opacity 0.4s ease;
+    z-index: 1060;
+    pointer-events: none;
+}
+#mensaje-carrito.show {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+/* Estilos de las tarjetas de producto (Tienda y Carrito) */
+.card {
+    background: #ffffff;
+    border: 1px solid #2563eb; /* Borde azul Ferremas */
+    border-radius: 16px; /* Bordes más redondeados */
+    color: #1a1a1a; /* Texto oscuro */
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    overflow: hidden;
 }
 
 .card:hover {
-  transform: translateY(-5px);
-  transition: all 0.3s ease-in-out;
-  box-shadow: 0 0.5rem 1rem rgba(0,0,0,.15);
+    transform: translateY(-6px);
+    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.2);
+}
+
+/* Estilos para imágenes de producto en tarjetas */
+.card img {
+    width: 100%;
+    max-height: 180px;
+    object-fit: contain;
+    background-color: #f1f1f1; /* Fondo claro para la imagen */
+    padding: 10px;
+    border-bottom: 1px solid #2563eb; /* Borde inferior azul */
+}
+
+/* Contenido del cuerpo de la tarjeta */
+.card-body {
+    padding: 1.2rem;
+    display: flex;
+    flex-direction: column; /* Asegura que el contenido se apile verticalmente */
 }
 
 .card-title {
-  font-size: 1.2rem;
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #1a1a1a;
+    margin-bottom: 0.5rem;
 }
 
 .card-text {
-  font-size: 0.95rem;
+    font-size: 0.9rem;
+    color: #333333;
+    margin-bottom: 1rem;
+    min-height: 48px; /* Altura mínima para descripciones cortas */
+    flex-grow: 1; /* Permite que la descripción crezca y empuje el botón hacia abajo */
+}
+
+.precio-stock {
+    display: flex;
+    justify-content: space-between;
+    font-weight: 600;
+    font-size: 0.95rem;
+    color: #2563eb; /* Azul Ferremas */
+    margin-bottom: 1rem;
+}
+
+.btn-agregar {
+    background-color: #2563eb; /* Azul Ferremas */
+    color: #ffffff;
+    font-weight: 700;
+    border: none;
+    border-radius: 10px;
+    padding: 0.5rem 1rem;
+    transition: background-color 0.3s ease;
+    width: 100%; /* Botón de ancho completo */
+}
+.btn-agregar:hover {
+    background-color: #1d4ed8; /* Azul oscuro al pasar el mouse */
 }
 
 
-@media (min-width: 992px) {
-  .list-hours {
-    width: 50%;
+/* --- Estilos para el Carrito (ítems generados con JavaScript) --- */
+/* Selectores ajustados para coincidir con la estructura de carrito.html y JS */
+#carrito-lista .cart-item {
+    display: flex; /* Usamos flexbox para alinear elementos horizontalmente */
+    align-items: center; /* Centra verticalmente */
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    margin-bottom: 15px;
+    padding: 15px;
+    background-color: #fff;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    position: relative; /* Para el botón de eliminar */
+}
+
+#carrito-lista .cart-item img {
+    width: 80px; /* Tamaño de la imagen */
+    height: 80px;
+    object-fit: contain; /* Para que la imagen no se recorte y mantenga su proporción */
+    margin-right: 20px;
+    border-radius: 5px;
+    border: 1px solid #f0f0f0;
+}
+
+#carrito-lista .cart-item .item-details {
+    flex-grow: 1; /* Permite que este div ocupe el espacio restante */
+}
+
+#carrito-lista .cart-item .item-details h5 {
+    margin-bottom: 5px;
+    font-size: 1.15rem;
+    color: #333;
+}
+
+#carrito-lista .cart-item .item-details p {
+    margin-bottom: 3px;
+    font-size: 0.95rem;
+    color: #666;
+}
+
+#carrito-lista .cart-item .item-quantity,
+#carrito-lista .cart-item .item-subtotal {
+    margin-left: 20px;
+    font-weight: bold;
+    text-align: right;
+}
+
+#carrito-lista .cart-item .item-quantity {
+    width: 80px; /* Ancho fijo para la cantidad */
+}
+
+#carrito-lista .cart-item .item-subtotal {
+    width: 120px; /* Ancho fijo para el subtotal */
     font-size: 1.1rem;
-  }
+    color: #2563eb; /* Azul Ferremas */
 }
 
-.address strong {
-  font-size: 1.2rem;
+#carrito-lista .btn-eliminar {
+    background: none;
+    border: none;
+    color: #dc3545; /* Rojo para el botón de eliminar */
+    font-size: 1.5rem;
+    position: absolute;
+    top: 5px;
+    right: 10px;
+    cursor: pointer;
+    transition: color 0.2s ease-in-out;
 }
 
-.footer {
-   background-color: rgba(0, 0, 0, 0.8);
+#carrito-lista .btn-eliminar:hover {
+    color: #c82333;
 }
 
-
-
-.btn {
-  box-shadow: 0px 3px 3px 0px rgba(33, 37, 41, 0.1);
+/* Estilos para el resumen del total (opcional, si no quieres tabla) */
+.total-pagar {
+    font-size: 1.8rem;
+    font-weight: bold;
+    color: #2563eb;
+    text-align: right;
+    margin-top: 30px;
+    padding-top: 15px;
+    border-top: 2px solid #eee;
 }
 
-
-
-.font-weight-light {
-  font-weight: 100 !important;
+/* Estilos para el modal - Traídos de carrito.html */
+.modal-content {
+    border-radius: 10px;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+}
+.modal-header {
+    background-color: #2563eb; /* Azul Ferremas */
+    color: white;
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+    border-bottom: none;
+}
+.modal-title {
+    font-weight: 700;
+}
+.modal-footer .btn-primary {
+    background-color: #2563eb;
+    border-color: #2563eb;
+}
+.modal-footer .btn-primary:hover {
+    background-color: #1d4ed8;
+    border-color: #1d4ed8;
+}
+.modal-footer .btn-secondary {
+    background-color: #6c757d;
+    border-color: #6c757d;
+}
+.modal-footer .btn-secondary:hover {
+    background-color: #5a6268;
+    border-color: #545b62;
 }
 
-.mbtm{
-  padding-top: 5rem;
+/* Estilos para la tabla de resumen del carrito (si la usas) - Traídos de carrito.html */
+.cart-summary-table {
+    margin-top: 30px;
+    border-collapse: collapse;
+    width: 100%;
+}
+.cart-summary-table th, .cart-summary-table td {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: left;
+}
+.cart-summary-table th {
+    background-color: #f2f2f2;
+    font-weight: bold;
+}
+.cart-summary-table .total-row {
+    font-size: 1.2rem;
+    font-weight: bold;
+    background-color: #e6f7ff; /* Un azul claro */
+}
+.cart-summary-table .total-row td {
+    color: #2563eb;
 }
 
-.mbt{
-  padding-top: 2rem;
+#carrito-vacio {
+    text-align: center;
+    font-size: 1.2rem;
+    color: #6c757d;
+    margin-top: 2rem;
+    /* display: none; Quitado de aquí, se gestiona con JS */
+}
+/* #carrito-vacio.visible { display: block; }  Quitado de aquí, se gestiona con JS */
+
+
+#form-pago-container {
+    margin-top: 3rem;
+    border-top: 1px solid #dee2e6;
+    padding-top: 2rem;
+}
+#form-pago-container h3 {
+    text-align: center;
+    margin-bottom: 1.5rem;
+    color: #1a1a1a;
+}
+#form-pago-container .form-label {
+    font-weight: 600;
+    margin-top: 1rem;
+}
+#form-pago-container .form-control,
+#form-pago-container .form-select {
+    border-radius: 8px;
+    border-color: #2563eb; /* Borde azul Ferremas */
+}
+#form-pago-container .btn-success {
+    background-color: #28a745; /* Verde de Bootstrap */
+    border-color: #28a745;
+    padding: 0.75rem 1.5rem;
+    font-size: 1.1rem;
+    font-weight: 700;
+    border-radius: 10px;
+    transition: background-color 0.3s ease;
+}
+#form-pago-container .btn-success:hover {
+    background-color: #218838;
+    border-color: #1e7e34;
 }
 
-.mbt1{
-  padding-top: 1.25rem;
-}
-
-a.link{
-  color: rgba(255, 255, 255, 0.7);
-}
-
-a.link:hover{
-  text-decoration: none;
-  color: rgba(255, 255, 255, 0.4);
-}
-
-.section-content{
-  font-family: 'Lora' !important;
-  font-size: 16px !important;
-  font-weight: 400 !important;
-  line-height: 28px !important;
-}
-
-ul.errorlist{
-  padding-top: .75rem;
-  font-style: italic;
-  color: red;
+/* Responsive */
+@media (min-width: 992px) {
+    .intro .intro-text {
+        width: 45%;
+    }
 }

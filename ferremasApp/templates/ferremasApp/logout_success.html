@@ -1,0 +1,57 @@
+{% extends "ferremasApp/base.html" %}
+{% load static %}
+
+{% block title %}Sesión Cerrada - Ferremas{% endblock %}
+
+{% block content %}
+<section class="page-section cta">
+    <div class="container">
+        <div class="row">
+            <div class="col-xl-9 mx-auto">
+                <div class="cta-inner bg-faded text-center rounded">
+                    <h2 class="section-heading mb-4">
+                        <span class="section-heading-upper">¡Hasta Pronto!</span>
+                        <span class="section-heading-lower">Sesión Cerrada</span>
+                    </h2>
+                    <p class="mb-0">Has cerrado tu sesión exitosamente. ¡Esperamos verte de nuevo pronto!</p>
+                    <p class="mt-3">
+                        <a href="{% url 'home' %}" class="btn btn-primary">Volver al inicio</a>
+                        <a href="{% url 'login' %}" class="btn btn-secondary">Iniciar sesión de nuevo</a>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    console.log('logout_success.html: Script de limpieza iniciado.'); 
+
+    document.addEventListener('DOMContentLoaded', function() {
+        console.log('logout_success.html: DOMContentLoaded disparado.'); 
+
+        // --- ¡CAMBIO AQUÍ! La clave del carrito es 'carrito' según tu Local Storage ---
+        const cartKey = 'carrito'; // <--- ¡AHORA COINCIDE CON TU LOCAL STORAGE!
+        // Si tienes una clave separada para el total, también deberías cambiarla aquí.
+        // Basado en tu Local Storage, solo tienes 'carrito', no un 'cartTotal' separado.
+        // const totalKey = 'cartTotal'; // Podrías tener una clave así, pero no se ve en tu imagen.
+
+        if (localStorage.getItem(cartKey)) {
+            localStorage.removeItem(cartKey);
+            console.log(`Carrito con clave "${cartKey}" limpiado del localStorage.`);
+        } else {
+            console.log(`La clave "${cartKey}" no se encontró en localStorage. Posiblemente ya estaba vacío o el nombre de la clave es incorrecto.`); 
+        }
+        
+        // Si manejas el total en una clave separada y se llama 'cartTotal',
+        // descomenta y ajusta esta sección. De lo contrario, no es necesaria.
+        // if (localStorage.getItem(totalKey)) {
+        //     localStorage.removeItem(totalKey);
+        //     console.log(`Total con clave "${totalKey}" del carrito limpiado del localStorage.`);
+        // } else {
+        //     console.log(`La clave "${totalKey}" no se encontró en localStorage.`); 
+        // }
+    });
+</script>
+{% endblock %}

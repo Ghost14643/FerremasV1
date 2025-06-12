@@ -1,258 +1,418 @@
 {% extends "ferremasApp/base.html" %}
+{% load static %}
+
+{% block title %}Carrito de Compras - Ferremas{% endblock %}
+
+{% block extra_head %}
+{# Carga de Font Awesome y Bootstrap Icons. Es buena práctica cargarlas en base.html si se usan globalmente. #}
+{# Pero si son específicas de carrito.html, este es el lugar correcto. #}
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
+
+<style>
+    /* Estilos para el modal - Puedes moverlos a gestion.css si lo prefieres */
+    .modal-content {
+        border-radius: 10px;
+        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+    }
+    .modal-header {
+        background-color: #2563eb; /* Azul Ferremas */
+        color: white;
+        border-top-left-radius: 10px;
+        border-top-right-radius: 10px;
+        border-bottom: none;
+    }
+    .modal-title {
+        font-weight: 700;
+    }
+    .modal-footer .btn-primary {
+        background-color: #2563eb;
+        border-color: #2563eb;
+    }
+    .modal-footer .btn-primary:hover {
+        background-color: #1d4ed8;
+        border-color: #1d4ed8;
+    }
+    .modal-footer .btn-secondary {
+        background-color: #6c757d;
+        border-color: #6c757d;
+    }
+    .modal-footer .btn-secondary:hover {
+        background-color: #5a6268;
+        border-color: #545b62;
+    }
+
+    /* --- ESTILOS MEJORADOS PARA LOS ÍTEMS DEL CARRITO --- */
+    #carrito-lista .cart-item {
+        display: flex; /* Usamos flexbox para alinear elementos horizontalmente */
+        align-items: center; /* Centra verticalmente */
+        border: 1px solid #e0e0e0;
+        border-radius: 8px;
+        margin-bottom: 15px;
+        padding: 15px;
+        background-color: #fff;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        position: relative; /* Para el botón de eliminar */
+    }
+
+    #carrito-lista .cart-item img {
+        width: 80px; /* Tamaño de la imagen */
+        height: 80px;
+        object-fit: contain; /* Para que la imagen no se recorte y mantenga su proporción */
+        margin-right: 20px;
+        border-radius: 5px;
+        border: 1px solid #f0f0f0;
+    }
+
+    #carrito-lista .item-details {
+        flex-grow: 1; /* Permite que este div ocupe el espacio restante */
+    }
+
+    #carrito-lista .item-details h5 {
+        margin-bottom: 5px;
+        font-size: 1.15rem;
+        color: #333;
+    }
+
+    #carrito-lista .item-details p {
+        margin-bottom: 3px;
+        font-size: 0.95rem;
+        color: #666;
+    }
+
+    #carrito-lista .item-quantity,
+    #carrito-lista .item-subtotal {
+        margin-left: 20px;
+        font-weight: bold;
+        text-align: right;
+    }
+
+    #carrito-lista .item-quantity {
+        width: 80px; /* Ancho fijo para la cantidad */
+    }
+
+    #carrito-lista .item-subtotal {
+        width: 120px; /* Ancho fijo para el subtotal */
+        font-size: 1.1rem;
+        color: #2563eb; /* Azul Ferremas */
+    }
+
+    #carrito-lista .btn-eliminar {
+        background: none;
+        border: none;
+        color: #dc3545; /* Rojo para el botón de eliminar */
+        font-size: 1.5rem;
+        position: absolute;
+        top: 5px;
+        right: 10px;
+        cursor: pointer;
+        transition: color 0.2s ease-in-out;
+    }
+
+    #carrito-lista .btn-eliminar:hover {
+        color: #c82333;
+    }
+
+    /* Estilos para el resumen del total (opcional, si no quieres tabla) */
+    .total-pagar {
+        font-size: 1.8rem;
+        font-weight: bold;
+        color: #2563eb;
+        text-align: right;
+        margin-top: 30px;
+        padding-top: 15px;
+        border-top: 2px solid #eee;
+    }
+
+    /* Estilos para la tabla de resumen del carrito */
+    .cart-summary-table {
+        margin-top: 30px;
+        border-collapse: collapse;
+        width: 100%;
+    }
+    .cart-summary-table th, .cart-summary-table td {
+        border: 1px solid #ddd;
+        padding: 8px;
+        text-align: left;
+    }
+    .cart-summary-table th {
+        background-color: #f2f2f2;
+        font-weight: bold;
+    }
+    .cart-summary-table .total-row {
+        font-size: 1.2rem;
+        font-weight: bold;
+        background-color: #e6f7ff; /* Un azul claro */
+    }
+    .cart-summary-table .total-row td {
+        color: #2563eb;
+    }
+</style>
+{% endblock %}
 
 {% block content %}
-<style>
-  body {
-    background-color: #000;
-    color: #eee;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  }
-  .container {
-    max-width: 700px;
-    margin: 3rem auto;
-    padding: 1.5rem;
-  }
-  h1 {
-    font-weight: 600;
-    letter-spacing: 1.5px;
-    margin-bottom: 2rem;
-  }
-  #carrito-vacio {
-    font-size: 1.25rem;
-    text-align: center;
-    margin-top: 3rem;
-    color: #aaa;
-  }
-  .card {
-    background: #111;
-    border: none;
-    border-radius: 12px;
-    margin-bottom: 1rem;
-    box-shadow: 0 4px 12px rgb(255 255 255 / 0.05);
-    display: flex;
-    align-items: center;
-    padding: 0.75rem;
-    gap: 1rem;
-    position: relative;
-  }
-  .card img {
-    max-height: 80px;
-    object-fit: contain;
-    border-radius: 8px;
-  }
-  .card-body {
-    flex: 1;
-  }
-  .card-title {
-    margin: 0;
-    font-weight: 700;
-    font-size: 1.1rem;
-  }
-  .card-text {
-    margin: 0.15rem 0;
-    font-size: 0.9rem;
-    color: #ccc;
-  }
-  .cantidad, .subtotal {
-    text-align: center;
-    font-weight: 600;
-    font-size: 0.95rem;
-    min-width: 70px;
-  }
-  #btn-pagar {
-    background-color: #1a73e8;
-    border: none;
-    font-weight: 600;
-    padding: 0.6rem 1.4rem;
-    border-radius: 8px;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-  }
-  #btn-pagar:disabled {
-    background-color: #555;
-    cursor: not-allowed;
-  }
-  #btn-pagar:hover:not(:disabled) {
-    background-color: #155ab6;
-  }
-  #form-pago-container {
-    margin-top: 2rem;
-  }
-  #form-pago-container h3 {
-    margin-bottom: 1rem;
-    font-weight: 600;
-    color: #eee;
-  }
-  #form-pago {
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
-  }
-  #form-pago label {
-    font-weight: 600;
-    color: #eee;
-  }
-  #form-pago input[type="text"],
-  #form-pago textarea,
-  #form-pago select {
-    width: 100%;
-    padding: 0.5rem;
-    border-radius: 6px;
-    border: 1px solid #444;
-    background-color: #222;
-    color: #eee;
-  }
-  #form-pago button {
-    background-color: #28a745;
-    border: none;
-    padding: 0.75rem 1.2rem;
-    border-radius: 8px;
-    color: white;
-    font-weight: 600;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-  }
-  #form-pago button:hover {
-    background-color: #1e7e34;
-  }
-  .total-pagar {
-    text-align: right;
-    font-weight: 700;
-    font-size: 1.25rem;
-    margin-top: 1.5rem;
-    color: #eee;
-  }
-  /* Botón eliminar estilo */
-  .btn-eliminar {
-    position: absolute;
-    top: 8px;
-    right: 8px;
-    background: transparent;
-    border: none;
-    color: #ff4d4d;
-    font-size: 1.2rem;
-    cursor: pointer;
-    transition: color 0.3s ease;
-  }
-  .btn-eliminar:hover {
-    color: #ff0000;
-  }
-</style>
+<section class="page-section cta">
+    <div class="container">
+        <h1 class="text-center mb-4">Tu Carrito de Compras</h1>
 
-<div class="container">
-    <h1>Tu Carrito de Compras</h1>
+        {# Contenedor para la lista de productos del carrito #}
+        <div id="carrito-lista"></div>
 
-    <div id="carrito-container"></div>
+        {# Mensaje de carrito vacío #}
+        <div id="carrito-vacio" class="text-center py-5 d-none">
+            <p class="lead">¡Tu carrito está vacío!</p>
+            <p>Empieza a agregar productos increíbles de Ferremas.</p>
+            {# URL 'tienda' en minúscula, consistente con urls.py #}
+            <a href="{% url 'tienda' %}" class="btn btn-info mt-3"><i class="bi bi-shop me-2"></i>Ir a la Tienda</a>
+        </div>
 
-    <div id="carrito-vacio">Tu carrito está vacío.</div>
+        {# Sección del total y botón de pagar #}
+        <div id="cart-actions" class="mt-4 d-flex justify-content-end align-items-center">
+            <h3 class="mb-0 me-3">Total: <span id="cart-total-display">$0</span></h3>
+            <button id="btn-pagar" disabled class="btn btn-primary btn-lg"><i class="bi bi-wallet-fill me-2"></i>Pagar</button>
+        </div>
 
-    <div class="mt-4 text-end">
-        <button id="btn-pagar" disabled>Pagar</button>
-    </div>
+        {# Aquí se mostrará el formulario de pago O el mensaje/modal de login/registro #}
+        {% if user.is_authenticated %}
+            <div id="form-pago-container" class="mt-5 border p-4 rounded bg-light d-none">
+                <h3 class="mb-4 text-center">Formulario de Pago</h3>
+                <form id="form-pago" method="POST" action="{% url 'iniciar_pago_transbank' %}">
+                    {% csrf_token %}
+                    <input type="hidden" name="total" id="total-pago" value="">
 
-    <div id="form-pago-container" class="d-none">
-        <h3>Formulario de Pago</h3>
-        <form id="form-pago" method="POST" action="{% url 'iniciar_pago_transbank' %}">
-            {% csrf_token %}
-            <input type="hidden" name="total" id="total-pago" value="">
-
-            <label for="nombre-completo">Nombre Completo</label>
-            <input type="text" id="nombre-completo" name="nombre_completo" required placeholder="Tu nombre completo">
-
-            <label for="direccion-envio">Dirección de Envío</label>
-            <textarea id="direccion-envio" name="direccion_envio" rows="3" required placeholder="Tu dirección de envío"></textarea>
-
-            <label for="tipo-tarjeta">Tipo de Tarjeta</label>
-            <select id="tipo-tarjeta" name="tipo_tarjeta" required>
-                <option value="" disabled selected>Selecciona un tipo de tarjeta</option>
-                <option value="credito">Tarjeta de Crédito</option>
-                <option value="debito">Tarjeta de Débito</option>
-            </select>
-
-            <button type="submit">Confirmar Pago</button>
-        </form>
-    </div>
-</div>
-
-<script>
-document.addEventListener("DOMContentLoaded", function () {
-    mostrarCarrito();
-});
-
-function mostrarCarrito() {
-    const carrito = JSON.parse(localStorage.getItem('carrito')) || [];
-    const container = document.getElementById('carrito-container');
-    const carritoVacio = document.getElementById('carrito-vacio');
-    const btnPagar = document.getElementById('btn-pagar');
-    const formPagoContainer = document.getElementById('form-pago-container');
-    const totalPagoInput = document.getElementById('total-pago');
-
-    container.innerHTML = '';
-
-    if (carrito.length === 0) {
-        carritoVacio.style.display = 'block';
-        btnPagar.disabled = true;
-        formPagoContainer.classList.add('d-none');
-        return;
-    } else {
-        carritoVacio.style.display = 'none';
-        btnPagar.disabled = false;
-    }
-
-    fetch('/api/productos')
-        .then(res => res.json())
-        .then(productos => {
-            let total = 0;
-            carrito.forEach(item => {
-                const producto = productos.find(p => p.id === item.id);
-                if (producto) {
-                    const subtotal = producto.precio * item.cantidad;
-                    total += subtotal;
-
-                    const card = document.createElement('div');
-                    card.className = 'card';
-
-                    card.innerHTML = `
-                        <button class="btn-eliminar" title="Eliminar" onclick="eliminarProducto(${item.id})">&times;</button>
-                        <img src="${producto.imagen}" alt="${producto.nombre}">
-                        <div class="card-body">
-                            <h5 class="card-title">${producto.nombre}</h5>
-                            <p class="card-text">${producto.descripcion}</p>
-                            <p class="card-text">Precio unitario: $${producto.precio.toLocaleString('es-CL')}</p>
+                    <div class="mb-3">
+                        <label for="nombre-completo" class="form-label">Nombre Completo</label>
+                        <input type="text" id="nombre-completo" name="nombre_completo" class="form-control" required placeholder="Ej: Juan Pérez" pattern="[A-Za-zÁÉÍÓÚáéíóúñÑ ]{5,}">
+                        <div class="invalid-feedback">
+                            Ingresa un nombre válido (solo letras, mínimo 5 caracteres).
                         </div>
-                        <div class="cantidad">Cantidad: <strong>${item.cantidad}</strong></div>
-                        <div class="subtotal">Subtotal:<br><strong>$${subtotal.toLocaleString('es-CL')}</strong></div>
-                    `;
-                    container.appendChild(card);
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="direccion-envio" class="form-label">Dirección de Envío</label>
+                        <textarea id="direccion-envio" name="direccion_envio" rows="3" class="form-control" required placeholder="Tu dirección de envío"></textarea>
+                        <div class="invalid-feedback">
+                            Ingresa una dirección válida.
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="tipo-tarjeta" class="form-label">Tipo de Tarjeta</label>
+                        <select id="tipo-tarjeta" name="tipo_tarjeta" class="form-select" required>
+                            <option value="" disabled selected>Selecciona un tipo de tarjeta</option>
+                            <option value="credito">Tarjeta de Crédito</option>
+                            <option value="debito">Tarjeta de Débito</option>
+                        </select>
+                        <div class="invalid-feedback">
+                            Selecciona un tipo de tarjeta.
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn btn-success mt-3 w-100">Confirmar Pago</button>
+                </form>
+            </div>
+        {% else %}
+            {# Si el usuario NO está autenticado, mostramos un mensaje para login/registro #}
+            <div id="login-registro-prompt" class="mt-5 text-center d-none p-4 border rounded bg-light">
+                <p class="lead">Para continuar con la compra, por favor <span class="fw-bold">inicia sesión</span> o <span class="fw-bold">regístrate</span>.</p>
+                {# CAMBIO CRÍTICO AQUÍ: 'login_view' a 'login' #}
+                <a href="{% url 'login' %}" class="btn btn-primary me-2"><i class="bi bi-box-arrow-in-right me-2"></i>Iniciar Sesión</a>
+                {# CAMBIO CRÍTICO AQUÍ: 'registro_view' a 'registro' #}
+                <a href="{% url 'registro' %}" class="btn btn-secondary"><i class="bi bi-person-plus-fill me-2"></i>Registrarse</a>
+            </div>
+        {% endif %}
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        mostrarCarrito();
+
+        // Validación de formulario de pago (ejemplo básico)
+        const formPago = document.getElementById('form-pago');
+        if (formPago) {
+            formPago.addEventListener('submit', function(event) {
+                let isValid = true;
+                const nombreInput = document.getElementById('nombre-completo');
+                const direccionInput = document.getElementById('direccion-envio');
+                const tarjetaSelect = document.getElementById('tipo-tarjeta');
+
+                // Validación de Nombre Completo
+                if (nombreInput.value.length < 5 || !/^[A-Za-zÁÉÍÓÚáéíóúñÑ\s]+$/.test(nombreInput.value)) {
+                    nombreInput.classList.add('is-invalid');
+                    isValid = false;
+                } else {
+                    nombreInput.classList.remove('is-invalid');
+                }
+
+                // Validación de Dirección de Envío
+                if (direccionInput.value.trim() === '') {
+                    direccionInput.classList.add('is-invalid');
+                    isValid = false;
+                } else {
+                    direccionInput.classList.remove('is-invalid');
+                }
+
+                // Validación de Tipo de Tarjeta
+                if (tarjetaSelect.value === '') {
+                    tarjetaSelect.classList.add('is-invalid');
+                    isValid = false;
+                } else {
+                    tarjetaSelect.classList.remove('is-invalid');
+                }
+
+                if (!isValid) {
+                    event.preventDefault(); // Evitar el envío si la validación falla
+                    alert('Por favor, completa correctamente todos los campos del formulario de pago.');
                 }
             });
+        }
+    });
 
-            const totalDiv = document.createElement('div');
-            totalDiv.className = 'total-pagar';
-            totalDiv.textContent = `Total a pagar: $${total.toLocaleString('es-CL')}`;
-            container.appendChild(totalDiv);
+    function mostrarCarrito() {
+        const carrito = JSON.parse(localStorage.getItem('carrito')) || [];
+        const container = document.getElementById('carrito-lista');
+        const carritoVacio = document.getElementById('carrito-vacio');
+        const btnPagar = document.getElementById('btn-pagar');
+        const cartActions = document.getElementById('cart-actions');
+        const formPagoContainer = document.getElementById('form-pago-container');
+        const loginRegistroPrompt = document.getElementById('login-registro-prompt');
+        const totalPagoInput = document.getElementById('total-pago');
+        const cartTotalDisplay = document.getElementById('cart-total-display');
 
-            totalPagoInput.value = total;
-        });
-}
+        container.innerHTML = ''; // Limpiar el contenedor de la lista
 
-// Función para eliminar producto del carrito
-function eliminarProducto(productId) {
-    let carrito = JSON.parse(localStorage.getItem('carrito')) || [];
-    carrito = carrito.filter(item => item.id !== productId);
-    localStorage.setItem('carrito', JSON.stringify(carrito));
-    mostrarCarrito();
-}
+        if (carrito.length === 0) {
+            carritoVacio.classList.remove('d-none'); // Mostrar mensaje de vacío
+            btnPagar.disabled = true;
+            cartActions.classList.add('d-none'); // Ocultar el total y botón de pagar
+            if (formPagoContainer) formPagoContainer.classList.add('d-none');
+            if (loginRegistroPrompt) loginRegistroPrompt.classList.add('d-none');
+            return;
+        } else {
+            carritoVacio.classList.add('d-none'); // Ocultar mensaje de vacío
+            btnPagar.disabled = false;
+            cartActions.classList.remove('d-none'); // Mostrar el total y botón de pagar
+        }
 
-document.getElementById('btn-pagar').addEventListener('click', () => {
-    const formPagoContainer = document.getElementById('form-pago-container');
-    if (formPagoContainer.classList.contains('d-none')) {
-        formPagoContainer.classList.remove('d-none');
-        window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
-    } else {
-        formPagoContainer.classList.add('d-none');
+        fetch('/api/productos/') // Asegúrate de que esta URL sea correcta para obtener todos los productos
+            .then(res => {
+                if (!res.ok) {
+                    throw new Error(`HTTP error! status: ${res.status}`);
+                }
+                return res.json();
+            })
+            .then(productos => {
+                let total = 0;
+                // Crear un mapa de productos por ID para un acceso rápido
+                const productosMap = new Map(productos.map(p => [p.id, p]));
+
+                carrito.forEach(item => {
+                    const producto = productosMap.get(parseInt(item.id));
+                    if (producto) {
+                        const subtotal = producto.precio * item.cantidad;
+                        total += subtotal;
+
+                        const itemDiv = document.createElement('div');
+                        itemDiv.className = 'cart-item animate__animated animate__fadeIn';
+                        itemDiv.innerHTML = `
+                            <button class="btn-eliminar" title="Eliminar" onclick="eliminarProducto(${item.id})" aria-label="Eliminar ${producto.nombre}">
+                                <i class="bi bi-x-circle-fill"></i>
+                            </button>
+                            <img src="${producto.imagen}" alt="${producto.nombre}" class="img-fluid">
+                            <div class="item-details">
+                                <h5 class="mb-1">${producto.nombre}</h5>
+                                <p class="mb-1">Precio unitario: <strong>$${parseFloat(producto.precio).toLocaleString('es-CL')}</strong></p>
+                            </div>
+                            <div class="item-quantity">Cant: <strong>${item.cantidad}</strong></div>
+                            <div class="item-subtotal">Subtotal: <strong>$${subtotal.toLocaleString('es-CL')}</strong></div>
+                        `;
+                        container.appendChild(itemDiv);
+                    } else {
+                        console.warn(`Producto con ID ${item.id} no encontrado en la API. Se eliminará del carrito.`);
+                        // Opcional: considerar cómo manejar esto si el producto no existe en la base de datos
+                        // Podrías llamar a eliminarProducto(item.id) aquí para limpiar el carrito local.
+                    }
+                });
+
+                // Actualizar display del total
+                cartTotalDisplay.textContent = `$${total.toLocaleString('es-CL')}`;
+
+                // Asignar el total al input oculto del formulario de pago
+                if (totalPagoInput) {
+                    totalPagoInput.value = total;
+                }
+
+                // Lógica para el botón "Pagar"
+                // Importante: Eliminar listeners anteriores para evitar duplicados si mostrarCarrito se llama múltiples veces.
+                btnPagar.removeEventListener('click', handlePagarClick);
+                btnPagar.addEventListener('click', handlePagarClick);
+
+                // Ocultar formulario de pago o prompt de login/registro al inicio
+                // Se ocultan por defecto y se muestran con handlePagarClick
+                if (formPagoContainer) formPagoContainer.classList.add('d-none');
+                if (loginRegistroPrompt) loginRegistroPrompt.classList.add('d-none');
+            })
+            .catch(error => {
+                console.error("Error al cargar los productos del carrito:", error);
+                container.innerHTML = `<p class="alert alert-danger">Hubo un error al cargar su carrito. Intente de nuevo más tarde.</p>`;
+                btnPagar.disabled = true;
+                cartActions.classList.add('d-none');
+                carritoVacio.classList.remove('d-none');
+            });
     }
-});
-</script>
 
+    function handlePagarClick() {
+        const formPagoContainer = document.getElementById('form-pago-container');
+        const loginRegistroPrompt = document.getElementById('login-registro-prompt');
+
+        // Django injecta `user.is_authenticated` como un booleano en el contexto del template
+        const isAuthenticated = {% if user.is_authenticated %}true{% else %}false{% endif %};
+
+        if (isAuthenticated) {
+            // Si el usuario está autenticado, muestra/oculta el formulario de pago
+            if (formPagoContainer) {
+                formPagoContainer.classList.toggle('d-none');
+            }
+            if (loginRegistroPrompt) {
+                loginRegistroPrompt.classList.add('d-none');
+            }
+        } else {
+            // Si el usuario NO está autenticado, muestra/oculta el prompt de login/registro
+            if (loginRegistroPrompt) {
+                loginRegistroPrompt.classList.toggle('d-none');
+            }
+            if (formPagoContainer) {
+                formPagoContainer.classList.add('d-none');
+            }
+        }
+    }
+
+    function eliminarProducto(productoId) {
+        let carrito = JSON.parse(localStorage.getItem('carrito')) || [];
+        carrito = carrito.filter(item => item.id !== productoId);
+        localStorage.setItem('carrito', JSON.stringify(carrito));
+        mostrarCarrito(); // Vuelve a renderizar el carrito después de eliminar
+        actualizarContador(); // Actualiza el contador global del carrito (si existe)
+
+        if (typeof mostrarMensaje === 'function') {
+            mostrarMensaje("Producto eliminado del carrito");
+        } else {
+            console.log("Producto eliminado del carrito."); // Mensaje en consola si mostrarMensaje no está definido
+        }
+    }
+
+    function actualizarContador() {
+        // Esta función asume que existe un elemento con id "contador-carrito"
+        // en tu base.html o en algún lugar accesible.
+        let carrito = JSON.parse(localStorage.getItem('carrito')) || [];
+        let totalCantidad = carrito.reduce((sum, item) => sum + item.cantidad, 0);
+        const contador = document.getElementById("contador-carrito");
+        if (contador) {
+            contador.textContent = totalCantidad;
+        }
+    }
+</script>
 {% endblock %}
