@@ -1,11 +1,65 @@
-{% extends 'ferremasApp/base.html' %}
-
-{% block content %}
-  <h2>Redireccionando a Transbank...</h2>
-  <form id="formTransbank" action="{{ url }}" method="POST">
-    <input type="hidden" name="token_ws" value="{{ token }}" />
-  </form>
-  <script>
-    document.getElementById('formTransbank').submit();
-  </script>
-{% endblock %}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Redirigiendo a Transbank...</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            background-color: #f0f2f5;
+            color: #333;
+            text-align: center;
+        }
+        .container {
+            background-color: #fff;
+            padding: 40px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            max-width: 500px;
+        }
+        h1 {
+            color: #0056b3;
+            margin-bottom: 20px;
+        }
+        p {
+            font-size: 1.1em;
+            line-height: 1.6;
+        }
+        .spinner {
+            border: 4px solid rgba(0, 0, 0, 0.1);
+            border-left-color: #007bff;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Redirigiendo al Portal de Pago Seguro de Transbank...</h1>
+        <div class="spinner"></div>
+        <p>Por favor, no cierres esta ventana. Serás redirigido automáticamente en unos segundos.</p>
+        <form id="transbankForm" action="{{ url }}" method="POST">
+            <input type="hidden" name="token_ws" value="{{ token }}">
+            <noscript>
+                <p>Tu navegador no soporta JavaScript. Por favor, haz clic en el botón para continuar:</p>
+                <button type="submit">Continuar a Transbank</button>
+            </noscript>
+        </form>
+    </div>
+    <script>
+        // Envía el formulario automáticamente al cargar la página
+        document.getElementById('transbankForm').submit();
+    </script>
+</body>
+</html>

@@ -12,6 +12,8 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 
 from pathlib import Path
 import os
+# from dotenv import load_dotenv # Descomentar si decides usar .env en el futuro
+# load_dotenv() # Descomentar si decides usar .env en el futuro
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -26,7 +28,13 @@ SECRET_KEY = 'django-insecure-w-myf6jf)dn%$+e*2-h-wrt7!(nr*&732=tv5t$@yjr+wof2vk
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [
+    '127.0.0.1',
+    'localhost',
+    # Si estás usando Ngrok para probar Transbank localmente,
+    # añade aquí tu URL de Ngrok (ej. 'abcdef123456.ngrok-free.app')
+    # Por ejemplo: 'your-ngrok-subdomain.ngrok-free.app',
+]
 
 
 # Application definition
@@ -40,7 +48,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'ferremasApp',
-    'api',  
+    'api',
+    'django.contrib.humanize', # Añadido 'django.contrib.humanize' para formatos de número
 ]
 
 MIDDLEWARE = [
@@ -65,10 +74,10 @@ TEMPLATES = [
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
+                'django.template.context_processors.debug',
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
-                'django.contrib.messages.context_processors.messages',
-                'django.template.context_processors.debug',
+                'django.contrib.messages.context_processors.messages', # Esta es la única línea para mensajes
             ],
         },
     },
@@ -85,12 +94,11 @@ DATABASES = {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'ferremas_db',
         'USER': 'root',
-        'PASSWORD': 'Coco.1630',  
+        'PASSWORD': 'Coco.1630',
         'HOST': 'localhost',
         'PORT': '3306',
     }
 }
-
 
 
 # Password validation
@@ -110,6 +118,11 @@ AUTH_PASSWORD_VALIDATORS = [
         'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
     },
 ]
+
+# Si estás utilizando un modelo de usuario personalizado (ej. CustomUser)
+# en tu aplicación 'ferremasApp', descomenta y ajusta la siguiente línea:
+# AUTH_USER_MODEL = 'ferremasApp.CustomUser'
+# Si no lo estás usando, déjala comentada.
 
 
 # Internationalization
@@ -138,3 +151,26 @@ STATICFILES_DIRS = [
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+
+# ====================================================================
+# Transbank Configuration (Ambiente de Integración)
+# ====================================================================
+# ATENCIÓN: Estas claves son para el ambiente de INTEGRACIÓN/PRUEBAS.
+# NO USAR EN PRODUCCIÓN. Para producción, debes obtener las claves reales de Transbank
+# e idealmente cargarlas desde variables de entorno (ej. usando python-dotenv).
+
+TBK_API_KEY_ID = '597055555532'
+TBK_API_KEY_SECRET = '579B532A7440BB0C9079DED94D31EA1615BACEB56610332264630D42D0A36B1C'
+TBK_ENVIRONMENT = 'INTEGRATION' # <--- ¡CORREGIDO A 'INTEGRATION' sin 'N' para que coincida con el error!
+
+
+TBK_API_BASE_URL = 'https://webpay3g.transbank.cl/rswebpayTransaction/api/webpay/v1.2'
+
+
+# ====================================================================
+# CMF API Configuration (Valor Dólar)
+# ====================================================================
+
+URL_BASE_CMF = "https://api.cmfchile.cl/api-sbifv3/recursos_api" # Ajustada a una URL más común para v3
+API_KEY_CMF = "793d989c2c3b0987eb56404ed529a24910086f80"

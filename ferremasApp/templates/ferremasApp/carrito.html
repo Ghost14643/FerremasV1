@@ -1,151 +1,83 @@
 {% extends "ferremasApp/base.html" %}
 {% load static %}
+{% load humanize %}
 
 {% block title %}Carrito de Compras - Ferremas{% endblock %}
 
 {% block extra_head %}
-{# Carga de Font Awesome y Bootstrap Icons. Es buena práctica cargarlas en base.html si se usan globalmente. #}
-{# Pero si son específicas de carrito.html, este es el lugar correcto. #}
 <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet" />
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
-
 <style>
-    /* Estilos para el modal - Puedes moverlos a gestion.css si lo prefieres */
-    .modal-content {
-        border-radius: 10px;
-        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
-    }
-    .modal-header {
-        background-color: #2563eb; /* Azul Ferremas */
-        color: white;
-        border-top-left-radius: 10px;
-        border-top-right-radius: 10px;
-        border-bottom: none;
-    }
-    .modal-title {
-        font-weight: 700;
-    }
-    .modal-footer .btn-primary {
-        background-color: #2563eb;
-        border-color: #2563eb;
-    }
-    .modal-footer .btn-primary:hover {
-        background-color: #1d4ed8;
-        border-color: #1d4ed8;
-    }
-    .modal-footer .btn-secondary {
-        background-color: #6c757d;
-        border-color: #6c757d;
-    }
-    .modal-footer .btn-secondary:hover {
-        background-color: #5a6268;
-        border-color: #545b62;
-    }
-
-    /* --- ESTILOS MEJORADOS PARA LOS ÍTEMS DEL CARRITO --- */
-    #carrito-lista .cart-item {
-        display: flex; /* Usamos flexbox para alinear elementos horizontalmente */
-        align-items: center; /* Centra verticalmente */
+    /* Estilos para los ítems del carrito (opcional, si no los tienes ya) */
+    .cart-item {
+        display: flex;
+        align-items: center;
         border: 1px solid #e0e0e0;
         border-radius: 8px;
-        margin-bottom: 15px;
         padding: 15px;
+        margin-bottom: 15px;
         background-color: #fff;
         box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-        position: relative; /* Para el botón de eliminar */
+        position: relative; /* Para posicionar el botón de eliminar */
     }
 
-    #carrito-lista .cart-item img {
-        width: 80px; /* Tamaño de la imagen */
-        height: 80px;
-        object-fit: contain; /* Para que la imagen no se recorte y mantenga su proporción */
+    .cart-item img {
+        width: 100px; /* Tamaño de la imagen del producto */
+        height: 100px;
+        object-fit: cover;
+        border-radius: 4px;
         margin-right: 20px;
-        border-radius: 5px;
-        border: 1px solid #f0f0f0;
     }
 
-    #carrito-lista .item-details {
-        flex-grow: 1; /* Permite que este div ocupe el espacio restante */
+    .cart-item .item-details {
+        flex-grow: 1; /* Ocupa el espacio restante */
     }
 
-    #carrito-lista .item-details h5 {
+    .cart-item .item-details h5 {
+        font-size: 1.25rem;
         margin-bottom: 5px;
-        font-size: 1.15rem;
         color: #333;
     }
 
-    #carrito-lista .item-details p {
-        margin-bottom: 3px;
-        font-size: 0.95rem;
+    .cart-item .item-details p {
+        margin-bottom: 0;
         color: #666;
     }
 
-    #carrito-lista .item-quantity,
-    #carrito-lista .item-subtotal {
-        margin-left: 20px;
-        font-weight: bold;
+    .cart-item .item-quantity {
+        display: flex;
+        align-items: center;
+        margin: 0 20px;
+    }
+
+    .cart-item .item-quantity input {
+        width: 70px; /* Ancho del input de cantidad */
+        text-align: center;
+    }
+
+    .cart-item .item-subtotal {
+        min-width: 120px; /* Asegura espacio para el subtotal */
         text-align: right;
-    }
-
-    #carrito-lista .item-quantity {
-        width: 80px; /* Ancho fijo para la cantidad */
-    }
-
-    #carrito-lista .item-subtotal {
-        width: 120px; /* Ancho fijo para el subtotal */
         font-size: 1.1rem;
-        color: #2563eb; /* Azul Ferremas */
+        font-weight: bold;
+        color: #007bff;
     }
 
-    #carrito-lista .btn-eliminar {
+    .btn-eliminar-item {
+        position: absolute;
+        top: 10px;
+        right: 10px;
         background: none;
         border: none;
-        color: #dc3545; /* Rojo para el botón de eliminar */
+        color: #dc3545;
         font-size: 1.5rem;
-        position: absolute;
-        top: 5px;
-        right: 10px;
         cursor: pointer;
-        transition: color 0.2s ease-in-out;
+        padding: 0;
+        line-height: 1;
     }
 
-    #carrito-lista .btn-eliminar:hover {
+    .btn-eliminar-item:hover {
         color: #c82333;
-    }
-
-    /* Estilos para el resumen del total (opcional, si no quieres tabla) */
-    .total-pagar {
-        font-size: 1.8rem;
-        font-weight: bold;
-        color: #2563eb;
-        text-align: right;
-        margin-top: 30px;
-        padding-top: 15px;
-        border-top: 2px solid #eee;
-    }
-
-    /* Estilos para la tabla de resumen del carrito */
-    .cart-summary-table {
-        margin-top: 30px;
-        border-collapse: collapse;
-        width: 100%;
-    }
-    .cart-summary-table th, .cart-summary-table td {
-        border: 1px solid #ddd;
-        padding: 8px;
-        text-align: left;
-    }
-    .cart-summary-table th {
-        background-color: #f2f2f2;
-        font-weight: bold;
-    }
-    .cart-summary-table .total-row {
-        font-size: 1.2rem;
-        font-weight: bold;
-        background-color: #e6f7ff; /* Un azul claro */
-    }
-    .cart-summary-table .total-row td {
-        color: #2563eb;
     }
 </style>
 {% endblock %}
@@ -155,24 +87,37 @@
     <div class="container">
         <h1 class="text-center mb-4">Tu Carrito de Compras</h1>
 
-        {# Contenedor para la lista de productos del carrito #}
-        <div id="carrito-lista"></div>
+        <div id="django-messages-container" class="mt-3">
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }} alert-dismissible fade show animate__animated animate__fadeInUp" role="alert">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        </div>
 
-        {# Mensaje de carrito vacío #}
+        <div id="carrito-lista">
+            <div class="text-center p-5">
+                <div class="spinner-border text-primary" role="status">
+                    <span class="visually-hidden">Cargando carrito...</span>
+                </div>
+                <p class="mt-3">Cargando carrito...</p>
+            </div>
+        </div>
+
         <div id="carrito-vacio" class="text-center py-5 d-none">
             <p class="lead">¡Tu carrito está vacío!</p>
             <p>Empieza a agregar productos increíbles de Ferremas.</p>
-            {# URL 'tienda' en minúscula, consistente con urls.py #}
             <a href="{% url 'tienda' %}" class="btn btn-info mt-3"><i class="bi bi-shop me-2"></i>Ir a la Tienda</a>
         </div>
 
-        {# Sección del total y botón de pagar #}
-        <div id="cart-actions" class="mt-4 d-flex justify-content-end align-items-center">
+        <div id="cart-actions" class="mt-4 d-flex justify-content-end align-items-center d-none">
             <h3 class="mb-0 me-3">Total: <span id="cart-total-display">$0</span></h3>
             <button id="btn-pagar" disabled class="btn btn-primary btn-lg"><i class="bi bi-wallet-fill me-2"></i>Pagar</button>
         </div>
 
-        {# Aquí se mostrará el formulario de pago O el mensaje/modal de login/registro #}
         {% if user.is_authenticated %}
             <div id="form-pago-container" class="mt-5 border p-4 rounded bg-light d-none">
                 <h3 class="mb-4 text-center">Formulario de Pago</h3>
@@ -212,12 +157,9 @@
                 </form>
             </div>
         {% else %}
-            {# Si el usuario NO está autenticado, mostramos un mensaje para login/registro #}
             <div id="login-registro-prompt" class="mt-5 text-center d-none p-4 border rounded bg-light">
                 <p class="lead">Para continuar con la compra, por favor <span class="fw-bold">inicia sesión</span> o <span class="fw-bold">regístrate</span>.</p>
-                {# CAMBIO CRÍTICO AQUÍ: 'login_view' a 'login' #}
                 <a href="{% url 'login' %}" class="btn btn-primary me-2"><i class="bi bi-box-arrow-in-right me-2"></i>Iniciar Sesión</a>
-                {# CAMBIO CRÍTICO AQUÍ: 'registro_view' a 'registro' #}
                 <a href="{% url 'registro' %}" class="btn btn-secondary"><i class="bi bi-person-plus-fill me-2"></i>Registrarse</a>
             </div>
         {% endif %}
@@ -227,10 +169,37 @@
 
 {% block extra_js %}
 <script>
+    function escapeHtmlAttribute(str) {
+        if (!str) return '';
+        const div = document.createElement('div');
+        div.appendChild(document.createTextNode(str));
+        return div.innerHTML.replace(/"/g, '&quot;').replace(/'/g, '&#x27;');
+    }
+
+    // Función para obtener el token CSRF desde las cookies (necesario para todas las peticiones POST)
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+
+    const URL_ELIMINAR_PRODUCTO = "{% url 'eliminar_del_carrito' 0 %}";
+    const URL_ACTUALIZAR_CANTIDAD = "{% url 'actualizar_cantidad_carrito' %}"; 
+    const URL_GET_CART_ITEMS = "{% url 'get_cart_items' %}"; // Nombre de URL corregido
+
+    console.log("Script carrito.html cargado y ejecutándose.");
+
     document.addEventListener("DOMContentLoaded", function () {
         mostrarCarrito();
-
-        // Validación de formulario de pago (ejemplo básico)
         const formPago = document.getElementById('form-pago');
         if (formPago) {
             formPago.addEventListener('submit', function(event) {
@@ -239,40 +208,50 @@
                 const direccionInput = document.getElementById('direccion-envio');
                 const tarjetaSelect = document.getElementById('tipo-tarjeta');
 
-                // Validación de Nombre Completo
-                if (nombreInput.value.length < 5 || !/^[A-Za-zÁÉÍÓÚáéíóúñÑ\s]+$/.test(nombreInput.value)) {
+                if (nombreInput && (nombreInput.value.length < 5 || !/^[A-Za-zÁÉÍÓÚáéíóúñÑ\s]+$/.test(nombreInput.value))) {
                     nombreInput.classList.add('is-invalid');
                     isValid = false;
-                } else {
+                } else if (nombreInput) {
                     nombreInput.classList.remove('is-invalid');
                 }
 
-                // Validación de Dirección de Envío
-                if (direccionInput.value.trim() === '') {
+                if (direccionInput && direccionInput.value.trim() === '') {
                     direccionInput.classList.add('is-invalid');
                     isValid = false;
-                } else {
+                } else if (direccionInput) {
                     direccionInput.classList.remove('is-invalid');
                 }
 
-                // Validación de Tipo de Tarjeta
-                if (tarjetaSelect.value === '') {
+                if (tarjetaSelect && tarjetaSelect.value === '') {
                     tarjetaSelect.classList.add('is-invalid');
                     isValid = false;
-                } else {
+                } else if (tarjetaSelect) {
                     tarjetaSelect.classList.remove('is-invalid');
                 }
 
                 if (!isValid) {
-                    event.preventDefault(); // Evitar el envío si la validación falla
-                    alert('Por favor, completa correctamente todos los campos del formulario de pago.');
+                    event.preventDefault();
+                    // Considera mostrar un mensaje más amigable al usuario que un alert genérico
+                    // alert('Por favor, completa correctamente todos los campos del formulario de pago.');
                 }
             });
         }
+
+        // Auto-cierre de mensajes Django
+        setTimeout(function() {
+            var djangoMessages = document.querySelectorAll('#django-messages-container .alert');
+            djangoMessages.forEach(function(msg) {
+                msg.classList.remove('show');
+                msg.classList.add('animate__fadeOutUp');
+                msg.addEventListener('animationend', function() {
+                    msg.remove();
+                });
+            });
+        }, 5000);
     });
 
     function mostrarCarrito() {
-        const carrito = JSON.parse(localStorage.getItem('carrito')) || [];
+        console.log("mostrarCarrito() se está ejecutando, solicitando datos al backend...");
         const container = document.getElementById('carrito-lista');
         const carritoVacio = document.getElementById('carrito-vacio');
         const btnPagar = document.getElementById('btn-pagar');
@@ -282,107 +261,175 @@
         const totalPagoInput = document.getElementById('total-pago');
         const cartTotalDisplay = document.getElementById('cart-total-display');
 
-        container.innerHTML = ''; // Limpiar el contenedor de la lista
+        // Mostrar spinner de carga
+        container.innerHTML = `
+            <div class="text-center p-5">
+                <div class="spinner-border text-primary" role="status">
+                    <span class="visually-hidden">Cargando carrito...</span>
+                </div>
+                <p class="mt-3">Cargando carrito...</p>
+            </div>
+        `;
+        // Ocultar elementos del carrito hasta que se carguen los datos
+        cartActions.classList.add('d-none');
+        carritoVacio.classList.add('d-none');
+        if (formPagoContainer) formPagoContainer.classList.add('d-none');
+        if (loginRegistroPrompt) loginRegistroPrompt.classList.add('d-none');
 
-        if (carrito.length === 0) {
-            carritoVacio.classList.remove('d-none'); // Mostrar mensaje de vacío
-            btnPagar.disabled = true;
-            cartActions.classList.add('d-none'); // Ocultar el total y botón de pagar
-            if (formPagoContainer) formPagoContainer.classList.add('d-none');
-            if (loginRegistroPrompt) loginRegistroPrompt.classList.add('d-none');
-            return;
-        } else {
-            carritoVacio.classList.add('d-none'); // Ocultar mensaje de vacío
-            btnPagar.disabled = false;
-            cartActions.classList.remove('d-none'); // Mostrar el total y botón de pagar
-        }
-
-        fetch('/api/productos/') // Asegúrate de que esta URL sea correcta para obtener todos los productos
+        fetch(URL_GET_CART_ITEMS)
             .then(res => {
                 if (!res.ok) {
-                    throw new Error(`HTTP error! status: ${res.status}`);
+                    return res.text().then(text => {
+                        console.error(`Error de API: Estado HTTP ${res.status}, respuesta: ${text}`);
+                        throw new Error(`Error al obtener ítems del carrito: ${res.status}`);
+                    });
                 }
                 return res.json();
             })
-            .then(productos => {
-                let total = 0;
-                // Crear un mapa de productos por ID para un acceso rápido
-                const productosMap = new Map(productos.map(p => [p.id, p]));
+            .then(data => {
+                console.log("Respuesta del backend (get_cart_items):", data);
+                const carritoItems = data.items || [];
+                let total = data.total_carrito;
+                const totalItemsInCart = data.total_items_count;
 
-                carrito.forEach(item => {
-                    const producto = productosMap.get(parseInt(item.id));
-                    if (producto) {
-                        const subtotal = producto.precio * item.cantidad;
-                        total += subtotal;
+                console.log(`Valores a mostrar: Total Carrito: ${total}, Cantidad total de items: ${totalItemsInCart}`);
 
+                container.innerHTML = ''; // Limpiar el spinner
+
+                if (carritoItems.length === 0) {
+                    carritoVacio.classList.remove('d-none');
+                    btnPagar.disabled = true;
+                    if (totalPagoInput) totalPagoInput.value = 0;
+                    cartTotalDisplay.textContent = '$0';
+                } else {
+                    carritoVacio.classList.add('d-none');
+                    btnPagar.disabled = false;
+                    cartActions.classList.remove('d-none');
+
+                    carritoItems.forEach(item => {
+                        // Asegúrate de que el precio y el subtotal sean números antes de formatear
+                        const precioUnitario = parseFloat(item.precio);
+                        const subtotal = parseFloat(item.subtotal); // Usar item.subtotal directamente del backend si ya lo calcula
+
+                        const escapedItemName = escapeHtmlAttribute(item.nombre);
                         const itemDiv = document.createElement('div');
                         itemDiv.className = 'cart-item animate__animated animate__fadeIn';
+                        
                         itemDiv.innerHTML = `
-                            <button class="btn-eliminar" title="Eliminar" onclick="eliminarProducto(${item.id})" aria-label="Eliminar ${producto.nombre}">
+                            <button class="btn-eliminar-item" data-product-id="${item.id}" title="Eliminar" aria-label="Eliminar ${escapedItemName}">
                                 <i class="bi bi-x-circle-fill"></i>
                             </button>
-                            <img src="${producto.imagen}" alt="${producto.nombre}" class="img-fluid">
+                            <img src="${item.imagen_url}" alt="${escapedItemName}" class="img-fluid">
                             <div class="item-details">
-                                <h5 class="mb-1">${producto.nombre}</h5>
-                                <p class="mb-1">Precio unitario: <strong>$${parseFloat(producto.precio).toLocaleString('es-CL')}</strong></p>
+                                <h5 class="mb-1">${item.nombre}</h5>
+                                <p class="mb-1">Precio unitario: <strong>$${precioUnitario.toLocaleString('es-CL')}</strong></p>
                             </div>
-                            <div class="item-quantity">Cant: <strong>${item.cantidad}</strong></div>
+                            <div class="item-quantity">
+                                <form class="form-actualizar-cantidad" data-product-id="${item.id}">
+                                    <label for="cantidad-${item.id}" class="sr-only">Cantidad para ${item.nombre}</label>
+                                    <input type="number" id="cantidad-${item.id}" name="cantidad" value="${item.cantidad}" min="1" max="${item.stock || 999}"
+                                        class="form-control text-center" style="width: 80px; display: inline-block;">
+                                    <button type="submit" class="btn btn-sm btn-info ms-2">Actualizar</button>
+                                </form>
+                            </div>
                             <div class="item-subtotal">Subtotal: <strong>$${subtotal.toLocaleString('es-CL')}</strong></div>
                         `;
                         container.appendChild(itemDiv);
+                    });
+
+                    // ADJUNTA EVENT LISTENERS DESPUÉS DE QUE LOS ELEMENTOS SON CREADOS
+                    attachEventListenersToCartItems();
+
+                    cartTotalDisplay.textContent = `$${parseFloat(total).toLocaleString('es-CL')}`;
+                    if (totalPagoInput) totalPagoInput.value = total;
+
+                    const isUserAuthenticatedElement = document.createElement('div');
+                    isUserAuthenticatedElement.innerHTML = `{% if user.is_authenticated %}true{% else %}false{% endif %}`;
+                    const isUserAuthenticated = isUserAuthenticatedElement.textContent === 'true';
+
+                    if (isUserAuthenticated) {
+                        if (formPagoContainer) formPagoContainer.classList.remove('d-none');
                     } else {
-                        console.warn(`Producto con ID ${item.id} no encontrado en la API. Se eliminará del carrito.`);
-                        // Opcional: considerar cómo manejar esto si el producto no existe en la base de datos
-                        // Podrías llamar a eliminarProducto(item.id) aquí para limpiar el carrito local.
+                        if (loginRegistroPrompt) loginRegistroPrompt.classList.remove('d-none');
                     }
-                });
 
-                // Actualizar display del total
-                cartTotalDisplay.textContent = `$${total.toLocaleString('es-CL')}`;
-
-                // Asignar el total al input oculto del formulario de pago
-                if (totalPagoInput) {
-                    totalPagoInput.value = total;
+                    // Previene múltiples listeners en el botón pagar
+                    btnPagar.removeEventListener('click', handlePagarClick); 
+                    btnPagar.addEventListener('click', handlePagarClick);
                 }
-
-                // Lógica para el botón "Pagar"
-                // Importante: Eliminar listeners anteriores para evitar duplicados si mostrarCarrito se llama múltiples veces.
-                btnPagar.removeEventListener('click', handlePagarClick);
-                btnPagar.addEventListener('click', handlePagarClick);
-
-                // Ocultar formulario de pago o prompt de login/registro al inicio
-                // Se ocultan por defecto y se muestran con handlePagarClick
-                if (formPagoContainer) formPagoContainer.classList.add('d-none');
-                if (loginRegistroPrompt) loginRegistroPrompt.classList.add('d-none');
+                actualizarContadorCarritoGlobal(totalItemsInCart);
             })
             .catch(error => {
-                console.error("Error al cargar los productos del carrito:", error);
-                container.innerHTML = `<p class="alert alert-danger">Hubo un error al cargar su carrito. Intente de nuevo más tarde.</p>`;
-                btnPagar.disabled = true;
-                cartActions.classList.add('d-none');
+                console.error("Error al cargar el carrito:", error);
+                container.innerHTML = `
+                    <div class="alert alert-danger text-center animate__animated animate__fadeIn">
+                        Hubo un error al cargar su carrito. Por favor, intente de nuevo más tarde.
+                        <br>Detalles del error: ${error.message}
+                    </div>
+                `;
                 carritoVacio.classList.remove('d-none');
+                if (btnPagar) btnPagar.disabled = true;
+                if (cartActions) cartActions.classList.add('d-none');
             });
+    }
+
+    // NUEVA FUNCIÓN PARA ADJUNTAR EVENT LISTENERS
+    function attachEventListenersToCartItems() {
+        // Adjuntar listeners para eliminar producto
+        const deleteButtons = document.querySelectorAll('.btn-eliminar-item');
+        deleteButtons.forEach(button => {
+            // Eliminar listener si ya existe para evitar duplicados
+            button.removeEventListener('click', handleDeleteButtonClick); 
+            button.addEventListener('click', handleDeleteButtonClick);
+        });
+
+        // Adjuntar listeners para actualizar cantidad
+        const updateForms = document.querySelectorAll('.form-actualizar-cantidad');
+        updateForms.forEach(form => {
+            // Eliminar listener si ya existe para evitar duplicados
+            form.removeEventListener('submit', handleUpdateFormSubmit);
+            form.addEventListener('submit', handleUpdateFormSubmit);
+        });
+    }
+
+    // Funciones manejadoras de eventos separadas para facilitar removeEventListener
+    function handleDeleteButtonClick() {
+        const productId = this.dataset.productId;
+        console.log("Eliminar botón clickeado para Producto ID:", productId);
+        eliminarProducto(productId);
+    }
+
+    function handleUpdateFormSubmit(event) {
+        event.preventDefault();
+        const productId = this.dataset.productId;
+        const newQuantity = this.querySelector('input[name="cantidad"]').value;
+        console.log("Actualizar formulario enviado para Producto ID:", productId, "Nueva Cantidad:", newQuantity);
+        actualizarCantidad(productId, newQuantity);
     }
 
     function handlePagarClick() {
         const formPagoContainer = document.getElementById('form-pago-container');
         const loginRegistroPrompt = document.getElementById('login-registro-prompt');
+        const btnPagar = document.getElementById('btn-pagar');
 
-        // Django injecta `user.is_authenticated` como un booleano en el contexto del template
-        const isAuthenticated = {% if user.is_authenticated %}true{% else %}false{% endif %};
+        const isAuthenticatedElement = document.createElement('div');
+        isAuthenticatedElement.innerHTML = `{% if user.is_authenticated %}true{% else %}false{% endif %}`;
+        const isAuthenticated = isAuthenticatedElement.textContent === 'true';
 
         if (isAuthenticated) {
-            // Si el usuario está autenticado, muestra/oculta el formulario de pago
             if (formPagoContainer) {
+                const isFormVisible = !formPagoContainer.classList.contains('d-none');
                 formPagoContainer.classList.toggle('d-none');
+                btnPagar.textContent = isFormVisible ? 'Pagar' : 'Ocultar Formulario';
             }
             if (loginRegistroPrompt) {
                 loginRegistroPrompt.classList.add('d-none');
             }
         } else {
-            // Si el usuario NO está autenticado, muestra/oculta el prompt de login/registro
             if (loginRegistroPrompt) {
+                const isPromptVisible = !loginRegistroPrompt.classList.contains('d-none');
                 loginRegistroPrompt.classList.toggle('d-none');
+                btnPagar.textContent = isPromptVisible ? 'Pagar' : 'Ocultar Opciones';
             }
             if (formPagoContainer) {
                 formPagoContainer.classList.add('d-none');
@@ -390,28 +437,84 @@
         }
     }
 
-    function eliminarProducto(productoId) {
-        let carrito = JSON.parse(localStorage.getItem('carrito')) || [];
-        carrito = carrito.filter(item => item.id !== productoId);
-        localStorage.setItem('carrito', JSON.stringify(carrito));
-        mostrarCarrito(); // Vuelve a renderizar el carrito después de eliminar
-        actualizarContador(); // Actualiza el contador global del carrito (si existe)
-
-        if (typeof mostrarMensaje === 'function') {
-            mostrarMensaje("Producto eliminado del carrito");
-        } else {
-            console.log("Producto eliminado del carrito."); // Mensaje en consola si mostrarMensaje no está definido
-        }
+    function eliminarProducto(productId) {
+        console.log("Enviando solicitud para eliminar producto ID:", productId);
+        fetch(URL_ELIMINAR_PRODUCTO.replace('0', productId), {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': getCookie('csrftoken'),
+                'Content-Type': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest',
+            }
+        })
+        .then(response => {
+            if (!response.ok) {
+                return response.text().then(text => { throw new Error(text); });
+            }
+            return response.json();
+        })
+        .then(data => {
+            console.log("Respuesta de eliminar producto:", data);
+            if (data.success) {
+                mostrarCarrito();
+                actualizarContadorCarritoGlobal(data.total_items);
+            } else {
+                alert(data.message || "Error al eliminar producto.");
+            }
+        })
+        .catch(error => {
+            console.error('Error al eliminar producto del carrito:', error);
+            alert("Hubo un error de red o servidor al eliminar el producto. Detalles: " + error.message);
+        });
     }
 
-    function actualizarContador() {
-        // Esta función asume que existe un elemento con id "contador-carrito"
-        // en tu base.html o en algún lugar accesible.
-        let carrito = JSON.parse(localStorage.getItem('carrito')) || [];
-        let totalCantidad = carrito.reduce((sum, item) => sum + item.cantidad, 0);
-        const contador = document.getElementById("contador-carrito");
+    function actualizarCantidad(productId, newQuantity) {
+        console.log("actualizarCantidad llamada para Producto ID:", productId, "Nueva Cantidad:", newQuantity); 
+        newQuantity = parseInt(newQuantity);
+        if (isNaN(newQuantity) || newQuantity <= 0) {
+            alert("La cantidad debe ser un número positivo.");
+            return;
+        }
+
+        fetch(URL_ACTUALIZAR_CANTIDAD, { 
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': getCookie('csrftoken'),
+                'Content-Type': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest',
+            },
+            body: JSON.stringify({ 'producto_id': productId, 'cantidad': newQuantity })
+        })
+        .then(response => {
+            if (!response.ok) {
+                return response.text().then(text => { throw new Error(text); });
+            }
+            return response.json();
+        })
+        .then(data => {
+            console.log("Respuesta de actualizar cantidad:", data);
+            if (data.success) {
+                mostrarCarrito();
+                actualizarContadorCarritoGlobal(data.total_items);
+            } else {
+                alert(data.message || "Error al actualizar la cantidad.");
+            }
+        })
+        .catch(error => {
+            console.error('Error al actualizar cantidad del producto:', error);
+            alert("Hubo un error de red o servidor al actualizar la cantidad. Detalles: " + error.message);
+        });
+    }
+
+    function actualizarContadorCarritoGlobal(totalItems) {
+        const contador = document.getElementById("cart-total"); // Asegúrate de que este ID exista en tu base.html para el contador del carrito
         if (contador) {
-            contador.textContent = totalCantidad;
+            contador.textContent = totalItems;
+            if (totalItems > 0) {
+                contador.classList.remove('d-none');
+            } else {
+                contador.classList.add('d-none');
+            }
         }
     }
 </script>

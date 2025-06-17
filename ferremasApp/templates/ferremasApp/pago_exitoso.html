@@ -1,0 +1,70 @@
+{% extends 'ferremasApp/base.html' %}
+{% load static %}
+{% load humanize %} {# Para el formato de moneda #}
+
+{% block title %}Pago Exitoso - Ferremas{% endblock %}
+
+{% block extra_head %}
+    {# Incluir animate.css si no está ya en base.html y lo quieres para los mensajes #}
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
+{% endblock %}
+
+{% block content %}
+<section class="page-section cta"> {# Envuelvo tu contenido en section.page-section.cta para mantener consistencia #}
+    <div class="container text-center py-5">
+        <h2 class="section-heading text-center mb-4">
+            <span class="section-heading-upper">¡Gracias por tu compra!</span>
+            {# Aquí podemos mostrar un mensaje general de éxito, o si prefieres, el que viene de messages #}
+            <span class="section-heading-lower">Compra Confirmada con Éxito</span>
+        </h2>
+
+        {# Contenedor para mensajes de Django, igual que en tienda.html #}
+        <div id="django-messages-container" class="mt-3">
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }} alert-dismissible fade show animate__animated animate__fadeInUp" role="alert">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        </div>
+
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <div class="cta-inner bg-faded text-center rounded p-4"> {# Añadí bg-faded, rounded y p-4 para estilo similar a otros cta-inner #}
+                    <p class="mb-3">Tu pago ha sido procesado exitosamente. Recibirás un correo de confirmación con los detalles de tu pedido.</p>
+                    <p class="mb-3"><strong>Detalles de la Transacción:</strong></p>
+                    <ul class="list-unstyled text-start mx-auto" style="max-width: 400px;"> {# Alineo la lista a la izquierda y limito el ancho #}
+                        {# Usamos las variables que la vista 'pago_exito' (que te proporcioné) envía al contexto #}
+                        <li><strong>Monto:</strong> ${{ amount|floatformat:"0"|intcomma }}</li>
+                        <li><strong>Orden de Compra:</strong> {{ buy_order }}</li>
+                        <li><strong>Código de Autorización:</strong> {{ authorization_code }}</li>
+                        <li><strong>Fecha:</strong> {{ transaction_date|date:"d M Y H:i" }}</li> {# Formateo de fecha más legible #}
+                        <li><strong>Tarjeta (últimos 4 dígitos):</strong> **** {{ card_number }}</li>
+                    </ul>
+                    <a href="{% url 'tienda' %}" class="btn btn-primary mt-4">Volver a la Tienda</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        // Ocultar mensajes de Django después de un tiempo, igual que en tienda.html
+        setTimeout(function() {
+            var djangoMessages = document.querySelectorAll('#django-messages-container .alert');
+            djangoMessages.forEach(function(msg) {
+                msg.classList.remove('show');
+                msg.classList.add('animate__fadeOutUp'); // Animación de salida
+                msg.addEventListener('animationend', function() {
+                    msg.remove(); // Elimina el elemento del DOM después de la animación
+                });
+            });
+        }, 5000); // Oculta después de 5 segundos
+    });
+</script>
+{% endblock %}

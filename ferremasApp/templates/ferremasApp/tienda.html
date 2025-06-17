@@ -1,5 +1,6 @@
 {% extends "ferremasApp/base.html" %}
 {% load static %}
+{% load humanize %} {# Para el formato de moneda #}
 
 {% block title %}Tienda - Ferremas{% endblock %}
 
@@ -7,215 +8,266 @@
 {# Aquí van los enlaces a librerías y estilos específicos de la tienda #}
 <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet" />
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
-<style>
-    /*
-     * Importante: El `body` y `mainNav` se definen en `base.html` o `gestion.css`.
-     * Evita redefinirlos aquí a menos que sea una sobreescritura MUY específica.
-     */
-
-    /* Ajuste para el container principal de tienda y carrito
-     * El estilo del `.container` ahora debe manejar solo el fondo/sombra si es necesario,
-     * pero el espaciado superior/inferior debería venir del `.page-section`.
-     */
-    .page-section .container {
-        /* max-width ya viene de la base. No es necesario redefinir */
-        /* margin ya viene del .page-section. No es necesario redefinir */
-        padding: 2rem; /* Mantén el padding interno */
-        background-color: #ffffff; /* Fondo blanco */
-        border-radius: 8px; /* Bordes ligeramente redondeados */
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05); /* Sombra sutil */
-    }
-
-    h1 {
-        font-weight: 700;
-        margin-bottom: 2.5rem;
-        text-align: center;
-        color: #000;
-    }
-
-    /* --- Estilos Específicos del Carrito de Compras (Icono y Mensaje) --- */
-    /* Asegúrate de que el icono fijo tenga espacio en la parte superior para no chocar con la barra de navegación */
-    .carrito-icono {
-        position: fixed;
-        top: 80px; /* Ajustado para estar debajo de la navbar principal */
-        right: 20px;
-        font-size: 1.8rem;
-        color: #007bff;
-        cursor: pointer;
-        z-index: 1050;
-        transition: color 0.3s ease;
-    }
-    .carrito-icono:hover { color: #0056b3; }
-    .badge-carrito {
-        position: absolute;
-        top: -6px;
-        right: -10px;
-        background-color: #007bff;
-        color: #fff;
-        font-size: 0.75rem;
-        font-weight: 700;
-        padding: 3px 7px;
-        border-radius: 9999px;
-        pointer-events: none;
-    }
-    #mensaje-carrito {
-        position: fixed;
-        bottom: 20px;
-        right: 20px;
-        background-color: #007bff;
-        color: #ffffff;
-        padding: 0.8rem 1.2rem;
-        border-radius: 10px;
-        font-weight: 600;
-        box-shadow: 0 4px 14px rgba(0, 123, 255, 0.6);
-        opacity: 0;
-        transition: opacity 0.4s ease;
-        z-index: 1060;
-        pointer-events: none;
-    }
-    #mensaje-carrito.show { opacity: 1; pointer-events: auto; }
-
-    /* --- Estilos Específicos de las Tarjetas de Producto (Tienda) --- */
-    .card {
-        background: #ffffff;
-        border: 1px solid #007bff;
-        border-radius: 16px;
-        color: #000000;
-        box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1);
-        transition: transform 0.3s ease, box-shadow 0.3s ease;
-        overflow: hidden;
-    }
-    .card:hover {
-        transform: translateY(-6px);
-        box-shadow: 0 12px 24px rgba(0, 0, 0, 0.2);
-    }
-    .card img {
-        width: 100%;
-        max-height: 180px;
-        object-fit: contain;
-        background-color: #f1f1f1;
-        padding: 10px;
-        border-bottom: 1px solid #007bff;
-    }
-    .card-body { padding: 1.2rem; }
-    .card-title { font-size: 1.1rem; font-weight: 700; color: #000000; }
-    .card-text {
-        font-size: 0.9rem;
-        color: #333333;
-        margin-bottom: 1rem;
-        min-height: 48px;
-    }
-    .precio-stock {
-        display: flex;
-        justify-content: space-between;
-        font-weight: 600;
-        font-size: 0.95rem;
-        color: #007bff;
-        margin-bottom: 1rem;
-    }
-    .btn-agregar {
-        background-color: #007bff;
-        color: #ffffff;
-        font-weight: 700;
-        border: none;
-        border-radius: 10px;
-        padding: 0.5rem 1rem;
-        transition: background-color 0.3s ease;
-    }
-    .btn-agregar:hover { background-color: #0056b3; }
-</style>
 {% endblock %}
 
 {% block content %}
-{# Envuelve el contenido principal en una sección con las clases de la plantilla base #}
 <section class="page-section cta">
-    <div class="container"> {# Este container ya tiene el max-width por defecto de Bootstrap, y los estilos de arriba #}
+    <div class="container">
         <h1>🛒 Catálogo de Productos</h1>
 
-        <a href="{% url 'carrito' %}" class="carrito-icono" aria-label="Ver carrito">
+        {# Contenedor para mensajes de Django #}
+        <div id="django-messages-container" class="mt-3">
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }} alert-dismissible fade show animate__animated animate__fadeInUp" role="alert">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        </div>
+
+        {# Tu icono flotante del carrito original #}
+        <a href="{% url 'carrito' %}" class="carrito-icono animate__animated animate__pulse animate__infinite" aria-label="Ver carrito">
             <i class="bi bi-cart-fill"></i>
-            <span id="contador-carrito" class="badge-carrito">0</span>
+            <span id="contador-carrito" class="badge-carrito">
+                {# El valor inicial se establecerá por JS al cargar la página #}
+                0 
+            </span>
         </a>
 
-        <div id="productos-container" class="row g-4"></div>
+        {# --- FILTRO Y BÚSQUEDA --- #}
+        <div class="row mb-4 align-items-end">
+            <div class="col-md-6 mb-3 mb-md-0">
+                <form action="{% url 'tienda' %}" method="GET" class="form-inline d-flex align-items-center">
+                    <label for="filtroCategoria" class="me-2 text-nowrap">Filtrar por Categoría:</label>
+                    <select name="categoria" id="filtroCategoria" class="form-select me-2">
+                        <option value="">Todas las Categorías</option>
+                        {% for categoria_obj in categorias_disponibles %}
+                            <option value="{{ categoria_obj.id }}" {% if categoria_obj.id|stringformat:"s" == categoria_seleccionada %}selected{% endif %}>
+                                {{ categoria_obj.nombre }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                    <button type="submit" class="btn btn-primary">Aplicar Filtro</button>
+                </form>
+            </div>
+            <div class="col-md-6">
+                <form action="{% url 'tienda' %}" method="GET" class="form-inline d-flex justify-content-md-end">
+                    {# Usamos 'query' en lugar de 'query_busqueda' según lo que retorna views.py #}
+                    <input type="text" name="q" class="form-control me-2" placeholder="Buscar producto..." value="{{ query|default_if_none:'' }}">
+                    <button type="submit" class="btn btn-primary"><i class="bi bi-search"></i> Buscar</button>
+                </form>
+            </div>
+        </div>
 
-        <div id="mensaje-carrito" role="alert" aria-live="polite"></div>
+        {# Mensaje de resultados de búsqueda #}
+        {% if query or categoria_seleccionada %}
+            <div class="alert alert-info text-center">
+                {% if query %}Resultados para "<strong>{{ query }}</strong>"{% endif %}
+                {% if query and categoria_seleccionada %},{% endif %}
+                {% if categoria_seleccionada %}Categoría: <strong>
+                    {# Encuentra el nombre de la categoría seleccionada para mostrarlo #}
+                    {% for categoria_obj in categorias_disponibles %}
+                        {% if categoria_obj.id|stringformat:"s" == categoria_seleccionada %}{{ categoria_obj.nombre }}{% endif %}
+                    {% endfor %}
+                </strong>{% endif %}
+                <a href="{% url 'tienda' %}" class="btn btn-link btn-sm">Limpiar Filtros</a>
+            </div>
+        {% endif %}
+
+        {# GRID DE PRODUCTOS #}
+        <div id="productos-container" class="row g-4">
+            {% if productos %}
+                {% for producto in productos %}
+                <div class="col-12 col-sm-6 col-md-4">
+                    <div class="card h-100 animate__animated animate__fadeIn">
+                        {% if producto.imagen %}
+                            <img src="{{ producto.imagen.url }}" alt="{{ producto.nombre }}" loading="lazy">
+                        {% else %}
+                            <img src="{% static 'ferremasApp/img/placeholder.png' %}" alt="{{ producto.nombre }}" loading="lazy">
+                        {% endif %}
+                        <div class="card-body">
+                            <h5 class="card-title">{{ producto.nombre }}</h5>
+                            <p class="card-text">{{ producto.descripcion }}</p>
+                            <p class="card-text"><strong>Categoría:</strong> {{ producto.categoria.nombre }}</p>
+                            <div class="precio-stock">
+                                <span>$ {{ producto.precio|floatformat:"0"|intcomma }}</span>
+                                <span>
+                                    Stock: {{ producto.stock }}
+                                    {% if producto.stock <= 5 and producto.stock > 0 %}
+                                        <span class="badge bg-warning text-dark badge-stock">¡Pocas!</span>
+                                    {% elif producto.stock == 0 %}
+                                        <span class="badge bg-danger badge-stock">Agotado</span>
+                                    {% endif %}
+                                </span>
+                            </div>
+                            {% if producto.stock > 0 %}
+                                {# Cambiamos a un botón que usará JS para actualizar el contador sin recargar #}
+                                <button type="button" class="btn-agregar mt-auto btn-add-to-cart"
+                                        data-product-id="{{ producto.id }}"
+                                        data-bs-toggle="tooltip" data-bs-placement="top" title="Agregar al carrito">
+                                    <i class="bi bi-cart-plus"></i> Agregar al Carrito
+                                </button>
+                            {% else %}
+                                <button class="btn-agregar mt-auto btn-secondary" disabled>
+                                    <i class="bi bi-cart-x"></i> Sin Stock
+                                </button>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            {% else %}
+                <div class="col-12 text-center py-5">
+                    <p class="alert alert-info">No se encontraron productos con los criterios seleccionados.</p>
+                    <a href="{% url 'tienda' %}" class="btn btn-info mt-3">Ver todos los productos</a>
+                </div>
+            {% endif %}
+        </div>
     </div>
 </section>
 {% endblock %}
 
 {% block extra_js %}
-{# Tu JavaScript específico de la tienda #}
 <script>
+    // Definir las URLs de Django como constantes JavaScript
+    const URL_AGREGAR_AL_CARRITO = "{% url 'agregar_al_carrito' %}";
+    const URL_GET_CART_TOTAL = "{% url 'get_cart_total' %}";
+
+    // Función auxiliar para obtener el token CSRF de las cookies.
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+
     document.addEventListener("DOMContentLoaded", function () {
-        cargarProductos();
-        actualizarContador();
+        // Inicializar Bootstrap Tooltips
+        var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+        var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+            return new bootstrap.Tooltip(tooltipTriggerEl)
+        })
+
+        // Inicializar el contador del carrito al cargar la página
+        actualizarContadorCarrito(); 
+
+        // Manejar clics en los botones "Agregar al Carrito"
+        const botonesAgregar = document.querySelectorAll('.btn-add-to-cart');
+        botonesAgregar.forEach(button => {
+            button.addEventListener('click', function(event) {
+                event.preventDefault();
+                const productId = this.dataset.productId;
+                // Asumo que siempre agregas 1 unidad desde la tienda
+                const quantity = 1; 
+                console.log(`Intentando agregar producto ${productId} (cantidad: ${quantity}) al carrito.`); 
+                console.log("CSRF Token antes de fetch:", getCookie('csrftoken')); 
+                agregarAlCarrito(productId, quantity); // Pasa la cantidad también
+            });
+        });
+
+        // Ocultar mensajes de Django después de un tiempo
+        setTimeout(function() {
+            var djangoMessages = document.querySelectorAll('#django-messages-container .alert');
+            djangoMessages.forEach(function(msg) {
+                msg.classList.remove('show');
+                msg.classList.add('animate__fadeOutUp');
+                msg.addEventListener('animationend', function() {
+                    msg.remove();
+                });
+            });
+        }, 5000);
     });
 
-    function cargarProductos() {
-        fetch("/api/productos")
+    /**
+     * Realiza una petición AJAX para agregar un producto al carrito en la sesión de Django.
+     * @param {string} productId - El ID del producto a agregar.
+     * @param {number} quantity - La cantidad a agregar.
+     */
+    function agregarAlCarrito(productId, quantity) {
+        fetch(URL_AGREGAR_AL_CARRITO, { 
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest',
+                'X-CSRFToken': getCookie('csrftoken')
+            },
+            body: JSON.stringify({ 'producto_id': productId, 'cantidad': quantity }) // Envía producto_id y cantidad
+        })
+        .then(response => {
+            // Siempre intentamos recargar la página para que Django Messages pueda renderizar el mensaje.
+            // Primero, aseguramos que la respuesta sea JSON si es posible, para actualizar el contador.
+            // Si hay un error de red o la respuesta no es JSON, simplemente recargamos.
+            return response.json().then(data => {
+                console.log('Respuesta al agregar al carrito:', data);
+                // Actualiza el contador del carrito inmediatamente si la respuesta lo proporciona
+                if (data.total_items !== undefined) {
+                    actualizarContadorCarrito(data.total_items);
+                }
+                window.location.reload(); // <--- RECARGA LA PÁGINA PARA MOSTRAR MENSAJES DE DJANGO
+            }).catch(error => {
+                console.error('Error al parsear JSON o de red:', error);
+                window.location.reload(); // <--- Si hay error de parseo o red, también recarga
+            });
+        })
+        .catch(error => {
+            console.error('Error de fetch general:', error);
+            window.location.reload(); // <--- Si hay un error general del fetch, recarga
+        });
+    }
+
+    /**
+     * Realiza una petición AJAX para obtener el total de ítems en el carrito de la sesión de Django.
+     * Actualiza el contador visible en el HTML.
+     * @param {number} [newTotalItems] - Opcional. Si se pasa, usa este valor en lugar de hacer otra petición AJAX.
+     */
+    function actualizarContadorCarrito(newTotalItems = null) {
+        const contador = document.getElementById("contador-carrito");
+        if (!contador) {
+            console.warn("Elemento #contador-carrito no encontrado.");
+            return;
+        }
+
+        if (newTotalItems !== null) {
+            contador.textContent = newTotalItems;
+            if (newTotalItems > 0) {
+                contador.classList.remove('d-none');
+            } else {
+                contador.classList.add('d-none');
+            }
+            return;
+        }
+
+        fetch(URL_GET_CART_TOTAL)
             .then(response => {
-                if (!response.ok) throw new Error("No se pudo obtener la lista de productos.");
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
                 return response.json();
             })
-            .then(productos => {
-                const container = document.getElementById("productos-container");
-                container.innerHTML = "";
-
-                productos.forEach(producto => {
-                    const col = document.createElement("div");
-                    col.className = "col-12 col-sm-6 col-md-4";
-
-                    col.innerHTML = `
-                        <div class="card h-100 animate__animated animate__fadeIn">
-                            <img src="${producto.imagen}" alt="${producto.nombre}" loading="lazy">
-                            <div class="card-body d-flex flex-column">
-                                <h5 class="card-title">${producto.nombre}</h5>
-                                <p class="card-text">${producto.descripcion}</p>
-                                <div class="precio-stock">
-                                    <span>$${parseInt(producto.precio).toLocaleString('es-CL')}</span>
-                                    <span>Stock: ${producto.stock}</span>
-                                </div>
-                                <button class="btn-agregar mt-auto" onclick="agregarAlCarrito(${producto.id})">
-                                    <i class="bi bi-cart-plus"></i> Agregar
-                                </button>
-                            </div>
-                        </div>
-                    `;
-                    container.appendChild(col);
-                });
+            .then(data => {
+                const totalItems = data.total_items;
+                contador.textContent = totalItems;
+                if (totalItems > 0) {
+                    contador.classList.remove('d-none');
+                } else {
+                    contador.classList.add('d-none');
+                }
             })
             .catch(error => {
-                const container = document.getElementById("productos-container");
-                container.innerHTML = `<p class="text-danger text-center">No se pudieron cargar los productos.</p>`;
-                console.error(error);
+                console.error('Error al obtener el total del carrito:', error);
+                contador.textContent = '0';
+                contador.classList.add('d-none');
             });
-    }
-
-    function agregarAlCarrito(productoId) {
-        let carrito = JSON.parse(localStorage.getItem('carrito')) || [];
-        const index = carrito.findIndex(p => p.id === productoId);
-        if (index !== -1) {
-            carrito[index].cantidad += 1;
-        } else {
-            carrito.push({ id: productoId, cantidad: 1 });
-        }
-        localStorage.setItem('carrito', JSON.stringify(carrito));
-        actualizarContador();
-        mostrarMensaje("Producto agregado al carrito");
-    }
-
-    function actualizarContador() {
-        let carrito = JSON.parse(localStorage.getItem('carrito')) || [];
-        let totalCantidad = carrito.reduce((sum, item) => sum + item.cantidad, 0);
-        document.getElementById("contador-carrito").textContent = totalCantidad;
-    }
-
-    function mostrarMensaje(texto) {
-        const mensaje = document.getElementById('mensaje-carrito');
-        mensaje.textContent = texto;
-        mensaje.classList.add('show');
-        setTimeout(() => mensaje.classList.remove('show'), 2000);
     }
 </script>
 {% endblock %}

@@ -13,12 +13,14 @@
 
     {# Font Awesome para íconos. Asegúrate de que los archivos estén en ferremasApp/vendor/font-awesome/ #}
     <link href="{% static 'ferremasApp/vendor/font-awesome/css/font-awesome.min.css' %}" rel="stylesheet">
+    {# Agregamos Bootstrap Icons para el ícono del carrito si Font Awesome no tiene uno que te guste o si prefieres este set #}
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet" />
+
 
     <title>{% block title %}Ferremas{% endblock %}</title>
 
     {% block extra_head %}
     {# Aquí se inyectarán las hojas de estilo adicionales o meta tags de las plantillas hijas #}
-    {# Por ejemplo, en carrito.html podría necesitar <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet" /> #}
     {% endblock %}
 </head>
 
@@ -29,14 +31,12 @@
 
     <nav class="navbar navbar-expand-lg navbar-light py-lg-4" id="mainNav">
         <div class="container">
-            {# URLs en minúscula para coincidir con urls.py #}
             <a class="navbar-brand text-uppercase font-weight-bold d-lg-none" href="{% url 'home' %}" style="color: white;">Ferremas</a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse" id="navbarResponsive">
                 <ul class="navbar-nav mx-auto">
-                    {# URLs en minúscula para coincidir con urls.py #}
                     <li class="nav-item {% if request.path == '/' %}active{% endif %}">
                         <a class="nav-link text-uppercase" href="{% url 'home' %}">Inicio</a>
                     </li>
@@ -50,11 +50,14 @@
                         <a class="nav-link text-uppercase" href="{% url 'reseñas' %}">Reseñas</a>
                     </li>
                     <li class="nav-item {% if '/contacto/' in request.path %}active{% endif %}">
-                        <a class="nav-link text-uppercase" href="{% url 'contacto' %}">Contacto</a>
+                        <a class="nav-link text-uppercase" href="{% url 'contact' %}">Contacto</a> {# <--- ¡CAMBIO AQUÍ! #}
                     </li>
-                    {# Carrito: Asegúrate de que la URL 'carrito' apunta a views.ver_carrito en urls.py #}
                     <li class="nav-item {% if '/carrito/' in request.path %}active{% endif %}">
-                        <a class="nav-link text-uppercase" href="{% url 'carrito' %}">Carrito</a>
+                        <a class="nav-link text-uppercase" href="{% url 'carrito' %}">
+                            Carrito 
+                            <i class="bi bi-cart"></i> 
+                            <span id="cart-total" class="badge rounded-pill bg-danger">0</span>
+                        </a>
                     </li>
                 </ul>
 
@@ -65,19 +68,13 @@
                             <span class="nav-link text-uppercase">Hola, {{ user.username }}</span>
                         </li>
                         <li class="nav-item">
-                            {# CAMBIO IMPORTANTE: Usa el nombre de URL que definimos en urls.py #}
-                            {# Ahora es 'logout', no 'logout_view' #}
                             <a class="nav-link text-uppercase" href="{% url 'logout' %}">Cerrar Sesión</a>
                         </li>
                     {% else %}
                         <li class="nav-item">
-                            {# CAMBIO IMPORTANTE: Usa el nombre de URL que definimos en urls.py #}
-                            {# Ahora es 'login', no 'login_view' #}
                             <a class="nav-link text-uppercase" href="{% url 'login' %}">Iniciar Sesión</a>
                         </li>
                         <li class="nav-item">
-                            {# CAMBIO IMPORTANTE: Usa el nombre de URL que definimos en urls.py #}
-                            {# Ahora es 'registro', no 'registro_view' #}
                             <a class="nav-link text-uppercase" href="{% url 'registro' %}">Registrarse</a>
                         </li>
                     {% endif %}
@@ -124,8 +121,30 @@
     {# Script de Bootstrap al final del body para un mejor rendimiento #}
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
 
+    {# Script para el contador del carrito #}
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            function updateCartTotal() {
+                fetch('{% url "get_cart_total" %}')
+                    .then(response => response.json())
+                    .then(data => {
+                        const cartTotalElement = document.getElementById('cart-total');
+                        if (cartTotalElement) {
+                            cartTotalElement.textContent = data.total_items;
+                        }
+                    })
+                    .catch(error => console.error('Error fetching cart total:', error));
+            }
+
+            // Llama a la función al cargar la página
+            updateCartTotal();
+        });
+    </script>
+
     {# Bloque para scripts JS adicionales de las plantillas hijas #}
     {% block extra_js %}
     {% endblock %}
+
+    <form style="display:none;">{% csrf_token %}</form>
 </body>
 </html>

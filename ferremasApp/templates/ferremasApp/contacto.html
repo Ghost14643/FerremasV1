@@ -10,33 +10,37 @@
 
             <h2 class="mb-4 text-center">📬 Contáctanos</h2>
 
-            {% if mensaje_exito %}
-                <div class="alert alert-success alert-dismissible fade show" role="alert">
-                    {{ mensaje_exito }}
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
-                </div>
+            {# Aquí es donde Django messages se mostrará, en lugar de mensaje_exito #}
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
+                    </div>
+                {% endfor %}
             {% endif %}
 
-            <form method="post" action="{% url 'enviar_contacto' %}" class="card p-4 shadow-sm">
+            {# EL CAMBIO ESTÁ EN LA SIGUIENTE LÍNEA: action="{% url 'contact' %}" #}
+            <form method="post" action="{% url 'contact' %}" class="card p-4 shadow-sm">
                 {% csrf_token %}
                 <div class="mb-3">
                     <label for="nombre" class="form-label">Nombre</label>
-                    <input type="text" class="form-control" id="nombre" name="nombre" required>
+                    <input type="text" class="form-control" id="nombre" name="nombre" required {% if request.POST.nombre %}value="{{ request.POST.nombre }}"{% endif %}>
                 </div>
 
                 <div class="mb-3">
                     <label for="email" class="form-label">Correo Electrónico</label>
-                    <input type="email" class="form-control" id="email" name="email" required>
+                    <input type="email" class="form-control" id="email" name="email" required {% if request.POST.email %}value="{{ request.POST.email }}"{% endif %}>
                 </div>
 
                 <div class="mb-3">
                     <label for="asunto" class="form-label">Asunto</label>
-                    <input type="text" class="form-control" id="asunto" name="asunto" required>
+                    <input type="text" class="form-control" id="asunto" name="asunto" required {% if request.POST.asunto %}value="{{ request.POST.asunto }}"{% endif %}>
                 </div>
 
                 <div class="mb-3">
                     <label for="mensaje" class="form-label">Mensaje</label>
-                    <textarea class="form-control" id="mensaje" name="mensaje" rows="5" required></textarea>
+                    <textarea class="form-control" id="mensaje" name="mensaje" rows="5" required>{{ request.POST.mensaje }}</textarea>
                 </div>
 
                 <div class="d-grid">

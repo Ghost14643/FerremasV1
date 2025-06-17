@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Redireccionando a Transbank...</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            text-align: center;
+            padding-top: 50px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Procesando tu pago...</h1>
+    <p>No cierres esta ventana. Serás redirigido a Transbank para finalizar el proceso.</p>
+    <form id="transbankForm" action="{{ url }}" method="POST">
+        <input type="hidden" name="token_ws" value="{{ token }}">
+        <noscript>
+            <p>Tu navegador no soporta JavaScript, por favor haz click en el botón para continuar.</p>
+            <input type="submit" value="Continuar con el pago">
+        </noscript>
+    </form>
+    <script>
+        // Este script envía el formulario automáticamente al cargar la página.
+        document.getElementById('transbankForm').submit();
+    </script>
+</body>
+</html>

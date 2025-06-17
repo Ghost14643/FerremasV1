@@ -479,7 +479,7 @@ h1, h2, h3, h4, h5, h6 {
     margin-top: 2rem;
     /* display: none; Quitado de aquí, se gestiona con JS */
 }
-/* #carrito-vacio.visible { display: block; }  Quitado de aquí, se gestiona con JS */
+/* #carrito-vacio.visible { display: block; }   Quitado de aquí, se gestiona con JS */
 
 
 #form-pago-container {
@@ -520,4 +520,9 @@ h1, h2, h3, h4, h5, h6 {
     .intro .intro-text {
         width: 45%;
     }
+}
+
+/* AÑADIDO: REGLA PARA OCULTAR LOS MENSAJES DE DJANGO EN EL LOGIN */
+.form-container .messages {
+    display: none !important;
 }
